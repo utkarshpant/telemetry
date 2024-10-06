@@ -1,9 +1,9 @@
-import { json, useFetcher } from '@remix-run/react';
+/* eslint-disable no-mixed-spaces-and-tabs */
+import { json, Location, useFetcher, useLocation, useSearchParams } from '@remix-run/react';
 import { type MetaFunction, type ActionFunctionArgs } from '@remix-run/node';
 import { prisma } from '../../prisma/db.server';
 import { comparePasswords } from '~/auth/utils.server';
 import PasswordInput from '~/components/PasswordInput';
-import { useRef } from 'react';
 import { User } from '@prisma/client';
 
 export const meta: MetaFunction = () => {
@@ -15,16 +15,16 @@ export const meta: MetaFunction = () => {
 
 type ActionData =
 	| {
-        message: string;
-	}
+			message: string;
+	  }
 	| {
-        message: string;
-        user: User;
-	}
+			message: string;
+			user: User;
+	  }
 	| {
-        message: string;
-        error: Error;
-	};
+			message: string;
+			error: Error;
+	  };
 
 /**
  * Handles the sign-in action for the authentication route.
@@ -100,9 +100,23 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function SignIn() {
 	const authFetcher = useFetcher<typeof action>();
-	const passwordRef = useRef<HTMLInputElement>(null);
 	const actionData = authFetcher.data as ActionData;
-    console.log(actionData?.message ?? "No message");
+	const [searchParams] = useSearchParams();
+	const location = useLocation();
+
+	function getDefaultEmail(
+		searchParams: URLSearchParams,
+		location: Location
+	): string | number | readonly string[] | undefined {
+		if (searchParams.has('email')) {
+			return searchParams.get('email') as string;
+		} else if (location.state && 'email' in location.state) {
+			return location.state.email;
+		} else {
+			return '';
+		}
+	}
+
 	return (
 		<authFetcher.Form
 			method='POST'
@@ -121,9 +135,10 @@ export default function SignIn() {
 					<input
 						type='text'
 						name='email_or_username'
+						defaultValue={getDefaultEmail(searchParams, location)}
 						className='p-2 rounded text-base focus:bg-white focus:text-black'
-						required
 						aria-required='true'
+						required
 					></input>
 				</label>
 			</div>
@@ -138,7 +153,6 @@ export default function SignIn() {
 						Password<span className='font-semibold text-red-600'>*</span>
 					</span>
 					<PasswordInput
-						ref={passwordRef}
 						name='password'
 						className='p-2 rounded text-base focus:bg-white focus:text-black'
 						aria-required='true'
@@ -146,9 +160,7 @@ export default function SignIn() {
 					></PasswordInput>
 				</label>
 				{actionData ? (
-					<p className='text-white text-xs'>
-						{actionData ? actionData.message : null}
-					</p>
+					<p className='text-white text-xs'>{actionData ? actionData.message : null}</p>
 				) : null}
 				<button
 					type='submit'

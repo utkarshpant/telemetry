@@ -32,15 +32,14 @@ model UserCredential {
 }
 
 model Session {
-    id           Int           @id @default(autoincrement())
-    userId       Int
-    sessionToken String        @unique
-    createdAt    DateTime      @default(now())
-    expiresAt    DateTime?
-    ipAddress    String?
-    userAgent    String?
-    status       SessionStatus
-    user         User          @relation(fields: [userId], references: [id])
+    id        String        @id @default(uuid())
+    userId    Int
+    createdAt DateTime      @default(now())
+    expiresAt DateTime?
+    ipAddress String?
+    userAgent String?
+    status    SessionStatus @default(ACTIVE)
+    user      User          @relation(fields: [userId], references: [id])
 
     @@map("sessions")
 }

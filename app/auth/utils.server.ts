@@ -1,4 +1,6 @@
 import bcrypt from 'bcryptjs';
+import { createSessionStorage } from '@remix-run/node';
+import { PrismaClient, Session } from '@prisma/client';
 
 /**
  *
@@ -22,3 +24,62 @@ export async function comparePasswords(
 ): Promise<boolean> {
 	return await bcrypt.compare(plaintextPassword, hashedPassword);
 }
+
+const prisma = new PrismaClient();
+
+export const { getSession, commitSession, destroySession } = createSessionStorage({
+	cookie: {
+		name: '__session',
+		secrets: [process.env.TELEMETRY_SECRET as string],
+		isSigned: true,
+		sameSite: 'lax',
+		maxAge: 60 * 60 * 24 * 30, // 30 days
+	},
+	async createData(data, expires) {
+		const session: Session = await prisma.session.create({
+			data: {
+				userId: data.userId,
+				expiresAt: expires,
+				ipAddress: data.ip,
+				userAgent: data.userAgent,
+			},
+		});
+		return session.id;
+	},
+	async readData(id) {
+		const session = await prisma.session.findUnique({
+			where: {
+				id,
+			},
+			include: {
+				user: true,
+			}
+		});
+		if (!session) return null;
+		return {
+			userId: session.userId,
+			sessionId: session.id,
+			user: session.user,
+		};
+	},
+	async updateData(id, data, expires) {
+		await prisma.session.update({
+			where: {
+				id,
+			},
+			data: {
+				expiresAt: expires,
+			},
+		});
+	},
+	async deleteData(id) {
+		await prisma.session.update({
+			where: {
+				id,
+			},
+			data: {
+				status: 'INACTIVE',
+			}
+		});
+	},
+});

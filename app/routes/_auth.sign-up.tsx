@@ -1,5 +1,6 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
 import { type ActionFunction, json } from '@remix-run/node';
-import { useFetcher, type MetaFunction } from '@remix-run/react';
+import { Link, useFetcher, useSearchParams, type MetaFunction } from '@remix-run/react';
 import { useRef, useState } from 'react';
 import PasswordInput from '~/components/PasswordInput';
 import { prisma } from '../../prisma/db.server';
@@ -13,15 +14,18 @@ export const meta: MetaFunction = () => {
 	];
 };
 
-type ActionData = {
-	message: string;
-} | {
-	message: string;
-	user: User;
-} | {
-	message: string;
-	error: Error;
-}
+type ActionData =
+	| {
+			message: string;
+	  }
+	| {
+			message: string;
+			user: User;
+	  }
+	| {
+			message: string;
+			error: Error;
+	  };
 
 export const action: ActionFunction = async ({ request }) => {
 	// read form data, create a user using prisma and return confirmation that user was created.
@@ -99,6 +103,10 @@ export default function SignUp() {
 		}
 	};
 
+	const emailRef = useRef<HTMLInputElement>(null);
+	const usernameRef = useRef<HTMLInputElement>(null);
+	const [searchParams] = useSearchParams();
+
 	return (
 		<authFetcher.Form
 			method='POST'
@@ -117,6 +125,7 @@ export default function SignUp() {
 					<input
 						type='text'
 						name='first_name'
+						defaultValue={searchParams.get('first_name') ?? ''}
 						className='p-2 rounded text-base focus:bg-white focus:text-black'
 						required
 						aria-required='true'
@@ -130,6 +139,7 @@ export default function SignUp() {
 					<input
 						type='text'
 						name='last_name'
+						defaultValue={searchParams.get('last_name') ?? ''}
 						className='p-2 rounded text-base focus:bg-white focus:text-black'
 					></input>
 				</label>
@@ -146,8 +156,18 @@ export default function SignUp() {
 					<input
 						type='text'
 						name='username'
+						ref={usernameRef}
+						defaultValue={searchParams.get('username') ?? ''}
 						className='p-2 rounded text-base focus:bg-white focus:text-black'
 						aria-required='true'
+						// onChange={() => {
+						// 	setSearchParams({
+						// 		...searchParams,
+						// 		...(usernameRef.current?.value
+						// 			? { username: usernameRef.current && usernameRef.current.value }
+						// 			: null),
+						// 	});
+						// }}
 						required
 					></input>
 				</label>
@@ -155,10 +175,22 @@ export default function SignUp() {
 					htmlFor='email'
 					className='w-auto flex flex-col text-xs'
 				>
-					Email
+					<span>
+						Email<span className='text-red-600 font-semibold'>*</span>
+					</span>
 					<input
 						type='email'
 						name='email'
+						defaultValue={searchParams.get('email') ?? ''}
+						// onChange={() => {
+						// 	setSearchParams({
+						// 		...searchParams,
+						// 		...(emailRef.current?.value
+						// 			? { email: emailRef.current && emailRef.current.value }
+						// 			: null),
+						// 	});
+						// }}
+						ref={emailRef}
 						className='p-2 rounded text-base focus:bg-white focus:text-black'
 					></input>
 				</label>
@@ -207,13 +239,7 @@ export default function SignUp() {
 			</div>
 			{/* Row 5 */}
 			<div className='w-full flex flex-col'>
-				{actionData && 'user' in actionData ? (
-					<p className='text-white text-xs'>
-						{actionData && 'user' in actionData ? (
-							<>{actionData.user.firstName}, you&apos;re good to go.</>
-						) : null}
-					</p>
-				) : null}
+				{actionData ? <p className='text-white text-xs'>{actionData.message}</p> : null}
 				<button
 					type='submit'
 					className='p-2 bg-cyan-950 w-full mt-4 text-white rounded'
@@ -222,12 +248,19 @@ export default function SignUp() {
 				</button>
 				<span className='text-xs font-white mt-2'>
 					Already a member?{' '}
-					<a
-						href='/sign-in'
+					<Link
+						to={{
+							pathname: '/sign-in',
+							search: searchParams.toString(),
+						}}
+						state={{
+							email: emailRef.current?.value,
+							username: usernameRef.current?.value,
+						}}
 						className='underline'
 					>
 						Sign in.
-					</a>
+					</Link>
 				</span>
 			</div>
 		</authFetcher.Form>
