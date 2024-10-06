@@ -2,9 +2,9 @@
 import { json, Location, useFetcher, useLocation, useSearchParams } from '@remix-run/react';
 import { type MetaFunction, type ActionFunctionArgs } from '@remix-run/node';
 import { prisma } from '../../prisma/db.server';
-import { comparePasswords } from '~/auth/utils.server';
+import { comparePasswords, commitSession, getSession } from '~/auth/utils.server';
+import { Session, User } from '@prisma/client';
 import PasswordInput from '~/components/PasswordInput';
-import { User } from '@prisma/client';
 
 export const meta: MetaFunction = () => {
 	return [
@@ -72,6 +72,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		if (user && 'credentials' in user && user.credentials) {
 			const passwordMatch = await comparePasswords(password, user.credentials.passwordHash);
 			if (passwordMatch) {
+				// create session
+				const cookies = request.headers.get('Cookie');
+				const session = await getSession(cookies);
+				session.set('userId', user.id);
+				session.set(
+					'ipAddress',
+					process.env.NODE_ENV === 'production'
+						? request.headers.get('X-Forwarded-For')
+						: '127.0.0.1'
+				);
+                session.set('userAgent', request.headers.get('User-Agent'));
 				return json(
 					{
 						user: {
@@ -84,7 +95,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 						},
 						message: `${user.firstName}, you've signed in successfully!`,
 					},
-					200
+					{
+                        headers: {
+                            'Set-Cookie': await commitSession(session),
+                        },
+                        status: 200,
+                    }
 				);
 			} else {
 				return json(
