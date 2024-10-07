@@ -1,7 +1,8 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
-import type { LinksFunction } from '@remix-run/node';
+import type { LinksFunction, LoaderFunction } from '@remix-run/node';
 
 import stylesheet from './tailwind.css?url';
+import { validateRequestAndReturnSession } from './auth/utils.server';
 
 export const links: LinksFunction = () => [
 	{ rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -19,6 +20,21 @@ export const links: LinksFunction = () => [
 		href: stylesheet,
 	},
 ];
+
+export const loader: LoaderFunction = async ({ request }) => {
+	const session = await validateRequestAndReturnSession(request);
+	if (session) {
+		return {
+			user: session.get('user'),
+			signedIn: true,
+		}
+	} else {
+		return {
+			user: null,
+			signedIn: false,
+		}
+	}
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
 	return (

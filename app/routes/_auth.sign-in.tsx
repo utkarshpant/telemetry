@@ -1,9 +1,16 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
-import { json, Location, useFetcher, useLocation, useSearchParams } from '@remix-run/react';
-import { type MetaFunction, type ActionFunctionArgs } from '@remix-run/node';
+import {
+	json,
+	Location,
+	redirect,
+	useFetcher,
+	useLocation,
+	useSearchParams,
+} from '@remix-run/react';
+import { type MetaFunction, type ActionFunctionArgs, LoaderFunction } from '@remix-run/node';
 import { prisma } from '../../prisma/db.server';
-import { comparePasswords, commitSession, getSession } from '~/auth/utils.server';
-import { Session, User } from '@prisma/client';
+import { comparePasswords, commitSession, getSession, validateRequestAndReturnSession } from '~/auth/utils.server';
+import { User } from '@prisma/client';
 import PasswordInput from '~/components/PasswordInput';
 
 export const meta: MetaFunction = () => {
@@ -11,6 +18,14 @@ export const meta: MetaFunction = () => {
 		{ title: 'Telemetry | Sign in' },
 		{ name: 'description', content: 'Sign into your Telemetry account.' },
 	];
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+	const session = await validateRequestAndReturnSession(request);
+    if (session) {
+        return redirect('/home');
+    }
+    return null;
 };
 
 type ActionData =
@@ -30,13 +45,14 @@ type ActionData =
  * Handles the sign-in action for the authentication route.
  *
  * The function performs the following steps:
- * 1. Extracts `email_or_username` and `password` from the form data.
- * 2. Searches for a user in the database with the provided email or username.
- * 3. If a user is found, it verifies the provided password against the stored password hash.
- * 4. If the password matches, returns a success response with user details.
- * 5. If the password does not match, returns an error response indicating incorrect password.
- * 6. If no user is found, returns an error response indicating the user is not found.
- * 7. If any error occurs during the process, returns a generic error response.
+ * 1. Extracts form data from the request.
+ * 2. Retrieves the user from the database based on the provided email or username.
+ * 3. If the user is not found, returns a 404 response with an error message.
+ * 4. If the user is found, verifies the provided password against the stored password hash.
+ * 5. If the password matches, creates a session and returns a 200 response with the user data and a success message.
+ * 6. If the password does not match, returns a 403 response with an error message.
+ *
+ * @throws {Error} If an error occurs while retrieving the user from the database.
  */
 export const action = async ({ request }: ActionFunctionArgs) => {
 	const formData = await request.formData();
@@ -72,36 +88,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 		if (user && 'credentials' in user && user.credentials) {
 			const passwordMatch = await comparePasswords(password, user.credentials.passwordHash);
 			if (passwordMatch) {
-				// create session
+				// create a new session
 				const cookies = request.headers.get('Cookie');
 				const session = await getSession(cookies);
-				session.set('userId', user.id);
 				session.set(
 					'ipAddress',
 					process.env.NODE_ENV === 'production'
 						? request.headers.get('X-Forwarded-For')
 						: '127.0.0.1'
 				);
-                session.set('userAgent', request.headers.get('User-Agent'));
-				return json(
-					{
-						user: {
-							first_name: user.firstName,
-							lastName: user.lastName,
-							username: user.username,
-							email: user.email,
-							bio: user.bio,
-							id: user.id,
-						},
-						message: `${user.firstName}, you've signed in successfully!`,
+                session.set('userId', user.id);
+				session.set('userAgent', request.headers.get('User-Agent'));
+				return redirect('/home', {
+					headers: {
+						'Set-Cookie': await commitSession(session),
 					},
-					{
-                        headers: {
-                            'Set-Cookie': await commitSession(session),
-                        },
-                        status: 200,
-                    }
-				);
+				});
 			} else {
 				return json(
 					{

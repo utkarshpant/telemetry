@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { createSessionStorage } from '@remix-run/node';
-import { PrismaClient, Session } from '@prisma/client';
+import { PrismaClient, Session, User } from '@prisma/client';
 
 /**
  *
@@ -28,7 +28,7 @@ export async function comparePasswords(
 const prisma = new PrismaClient();
 
 export const { getSession, commitSession, destroySession } = createSessionStorage<
-	Pick<Session, 'ipAddress' | 'userId' | 'userAgent'>
+	Pick<Session, 'ipAddress' | 'userId' | 'userAgent'> & { user: User }
 >({
 	cookie: {
 		name: '__session',
@@ -49,9 +49,9 @@ export const { getSession, commitSession, destroySession } = createSessionStorag
 		return session.id;
 	},
 	async readData(id) {
-		const session = await prisma.session.findUnique({
+		const session = await prisma.session.findFirst({
 			where: {
-				id,
+				AND: [{ id }, { status: 'ACTIVE' }, { expiresAt: { gte: new Date() } }],
 			},
 			include: {
 				user: true,
@@ -85,3 +85,15 @@ export const { getSession, commitSession, destroySession } = createSessionStorag
 		});
 	},
 });
+
+/**
+ * Validates a request to ensure that it contains a valid session cookie.
+ *
+ * @param request - The incoming request to validate.
+ * @returns A promise that resolves to the session data if the request is valid, or null if the request is invalid.
+ */
+export async function validateRequestAndReturnSession(request: Request) {
+	const cookies = request.headers.get('Cookie');
+	if (!cookies?.includes('__session')) return null;
+	return await getSession(cookies);
+}
