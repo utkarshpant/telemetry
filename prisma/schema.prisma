@@ -25,25 +25,37 @@ model User {
 }
 
 model Story {
-    id        Int           @id @default(autoincrement())
-    title     String
-    subtitle  String?
-    content   String
-    createdAt DateTime      @default(now())
-    updatedAt DateTime      @updatedAt
-    authors   StoryAuthor[]
-    views     Int           @default(0)
+    id          Int           @id @default(autoincrement())
+    title       String
+    subtitle    String?
+    content     String
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    publishedAt DateTime?
+    authors     StoryAuthor[]
+    views       StoryViews[]
+    isPublished Boolean       @default(false)
 
     @@map("stories")
 }
 
-model StoryAuthor {
-    story   Story @relation(fields: [storyId], references: [id])
+model StoryViews {
     storyId Int
-    user    User  @relation(fields: [userId], references: [id])
-    userId  Int
-	createdAt DateTime @default(now())
-	updatedAt DateTime @updatedAt
+    date    DateTime @default(now())
+    count   Int      @default(0)
+    story   Story    @relation(fields: [storyId], references: [id])
+
+    @@id([storyId, date]) // Composite primary key
+    @@map("story_views")
+}
+
+model StoryAuthor {
+    story     Story    @relation(fields: [storyId], references: [id])
+    storyId   Int
+    user      User     @relation(fields: [userId], references: [id])
+    userId    Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@id([storyId, userId]) // Composite primary key
     @@map("story_authors")

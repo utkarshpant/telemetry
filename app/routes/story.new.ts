@@ -11,8 +11,8 @@ export const action: ActionFunction = async ({ request }) => {
     const userId = session.get('userId');
     const story = await prisma.story.create({
         data: {
-            title: 'Untitled Story',
-            content: 'Once upon a time...',
+            title: '',
+            content: '',
             authors: {
                 create: {
                     user: {
