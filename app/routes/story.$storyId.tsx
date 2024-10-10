@@ -1,10 +1,11 @@
+/* eslint-disable react/no-children-prop */
 /* eslint-disable no-mixed-spaces-and-tabs */
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { prisma } from 'prisma/db.server';
 import { json, LoaderFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { type Story } from '@prisma/client';
-import EditableTitle from '~/components/EditableTitle';
+import LexicalEditor from '~/components/Editor/LexicalEditor';
 
 type LoaderData =
 	| {
@@ -49,9 +50,13 @@ export default function Story() {
 	const loaderData = useLoaderData() as LoaderData;
 	if ('story' in loaderData) {
 		return (
-			<div className='w-full h-full flex flex-col gap-4 p-12'>
-				<h2 className='text-base'>{loaderData.story.content ?? "This is a placeholder."}</h2>
+			<div className='w-full h-full flex flex-col gap-4 relative'>
+				<LexicalEditor
+					initialContent={loaderData.story.content}
+					allowEdits={loaderData.allowEdits}
+				/>
 			</div>
 		);
 	}
+	return <div>Sorry, we couldn&apos;t find that story!</div>;
 }

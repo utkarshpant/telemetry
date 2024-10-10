@@ -4,12 +4,12 @@
  * A 200 OK response indicates updates were successful.
  */
 
-import { json, redirect, type LoaderFunction } from '@remix-run/node';
+import { json, type LoaderFunction } from '@remix-run/node';
 import { prisma } from '../../prisma/db.server';
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 import EditMaterialIcon from '../assets/edit-material-icon.svg?url';
-import { useFetcher } from '@remix-run/react';
+// import { useFetcher } from '@remix-run/react';
 
 export const loader: LoaderFunction = async ({ request, params }) => {
 	const session = await validateRequestAndReturnSession(request);
@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	const { storyId } = params;
 	const updates = await request.json();
 	try {
-		const story = await prisma.story.update({
+		await prisma.story.update({
 			where: {
 				id: Number(storyId),
 				authors: {
@@ -36,7 +36,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 		});
 		return json(200);
 	} catch (e) {
-		return json({ message: e.message ?? 'Something went wrong.' }, { status: 500 });
+		if (e instanceof Error) {
+			return json({ message: e.message ?? 'Something went wrong.' }, { status: 500 });
+		}
 	}
 };
 
@@ -47,7 +49,7 @@ export default function EditableTitle({
 	editable: boolean;
 	defaultValue: string;
 }) {
-    const fetcher = useFetcher();
+	// const fetcher = useFetcher();
 	const [allowEdits, setAllowEdits] = useState<boolean>(false);
 	const postIsEditable = editable && allowEdits;
 	return (
@@ -67,10 +69,11 @@ export default function EditableTitle({
 				className={`text-6xl ${postIsEditable ? 'border-b-white' : 'border-b-transparent'}`}
 				aria-label='Editable title'
 				disabled={!editable || !allowEdits}
-                defaultValue={defaultValue}
-			>
-			</input>
+				defaultValue={defaultValue}
+				onChange={(e) => {
+					console.log(e.target.value);
+				}}
+			></input>
 		</div>
 	);
 }
-
