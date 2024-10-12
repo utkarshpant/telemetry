@@ -88,14 +88,14 @@ export default function Editor({
 				>
 					{children}
 					<ToolbarPlugin />
-					<OnChangePlugin
+					{/* <OnChangePlugin
 						onChange={(editorState, editor) => {
 							editorState.read(() => {
 								console.log(editorState);
 							});
 						}}
 						ignoreSelectionChange
-					/>
+					/> */}
 					<RichTextPlugin
 						contentEditable={
 							<ContentEditable className='animate-fade-in p-4 w-full h-full text-white border-none focus:outline-none text-2xl md:text-xl font-serif text-left' />

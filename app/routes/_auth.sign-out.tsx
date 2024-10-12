@@ -4,7 +4,6 @@ import { json, useFetcher } from '@remix-run/react';
 import { validateRequestAndReturnSession, destroySession } from '~/auth/utils.server';
 
 export const action: ActionFunction = async ({ request }) => {
-	console.log('Sign out requested', request);
 	const session = await validateRequestAndReturnSession(request);
 	if (session) {
 		return redirect('/sign-in', {

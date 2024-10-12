@@ -3,11 +3,19 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $findMatchingParent, mergeRegister } from '@lexical/utils';
 import {
 	$createParagraphNode,
+	$createTextNode,
+	$getRoot,
 	$getSelection,
 	$isRangeSelection,
 	$isRootOrShadowRoot,
+	COMMAND_PRIORITY_CRITICAL,
 	FORMAT_TEXT_COMMAND,
+	INSERT_PARAGRAPH_COMMAND,
+	KEY_ARROW_DOWN_COMMAND,
+	KEY_ENTER_COMMAND,
+	KEY_SPACE_COMMAND,
 	SELECTION_CHANGE_COMMAND,
+	TextNode,
 } from 'lexical';
 import {
 	$createHeadingNode,
@@ -17,6 +25,8 @@ import {
 } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
 import { useCallback, useRef, useState, useEffect } from 'react';
+import { $isTitleNode, TitleNode } from './nodes/TitleNode';
+import { INSERT_EMBED_COMMAND } from '@lexical/react/LexicalAutoEmbedPlugin';
 
 export default function ToolbarPlugin() {
 	const [editor] = useLexicalComposerContext();
@@ -54,7 +64,7 @@ export default function ToolbarPlugin() {
 			editor.registerUpdateListener(({ editorState }) => {
 				editorState.read(() => {
 					$updateToolbar();
-				})
+				});
 			}),
 			editor.registerCommand(
 				SELECTION_CHANGE_COMMAND,
@@ -63,14 +73,30 @@ export default function ToolbarPlugin() {
 					return false;
 				},
 				1
-			)
+			),
+			editor.registerCommand(
+				KEY_ENTER_COMMAND,
+				(event) => {
+					const selection = $getSelection();
+					if ($isRangeSelection(selection)) {
+						const anchorNode = selection.anchor.getNode();
+						if (anchorNode.getParent()?.getType() === 'title') {
+							event?.preventDefault();
+							editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
+							return true;
+						}
+					}
+					return false;
+				},
+				4
+			),
 		);
 	}, [editor, $updateToolbar]);
 
 	if (editor.isEditable()) {
 		return (
 			<div
-				className='animate-fade-in z-10 flex flex-col rounded font-sans gap-2 px-4 py-2 m-2 bg-gray-600 bg-opacity-50 text-white align-baseline'
+				className='sticky top-2 animate-fade-in z-10 flex flex-col rounded font-sans gap-2 px-4 py-2 m-2 bg-gray-600 text-white align-baseline'
 				ref={toolbarRef}
 			>
 				<span className='text-sm md:text-xs'>Formatting</span>
