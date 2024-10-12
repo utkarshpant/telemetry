@@ -17,6 +17,10 @@ export const links: LinksFunction = () => [
 	},
 	{
 		rel: 'stylesheet',
+		href: 'https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=erode@1,2&display=swap',
+	},
+	{
+		rel: 'stylesheet',
 		href: stylesheet,
 	},
 ];

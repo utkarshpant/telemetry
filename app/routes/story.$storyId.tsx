@@ -7,7 +7,7 @@ import { useLoaderData } from '@remix-run/react';
 import { type Story } from '@prisma/client';
 import LexicalEditor from '~/components/Editor/LexicalEditor';
 
-type LoaderData =
+export type StoryLoaderData =
 	| {
 			story: Story;
 			allowEdits: boolean;
@@ -47,14 +47,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 export default function Story() {
-	const loaderData = useLoaderData() as LoaderData;
+	const loaderData = useLoaderData() as StoryLoaderData;
 	if ('story' in loaderData) {
 		return (
-			<div className='w-full h-full flex flex-col gap-4 relative'>
-				<LexicalEditor
-					initialContent={loaderData.story.content}
-					allowEdits={loaderData.allowEdits}
-				/>
+			<div className='w-full h-full flex flex-col gap-0'>
+				<div
+					aria-label='Title'
+					className='text-6xl p-4 w-full font-heading animate-fade-in m-auto mt-2 py-6 bg-neutral-950 border border-transparent hover:border hover:border-b-white hover:border-opacity-50 break-words'
+					contentEditable={false}
+					>
+						{loaderData.story.title}
+					</div>
+				<div className='relative h-full w-full m-auto' id='editor-container'>
+					<LexicalEditor
+						initialContent={loaderData.story.content}
+						allowEdits={loaderData.allowEdits}
+					/>
+				</div>
 			</div>
 		);
 	}
