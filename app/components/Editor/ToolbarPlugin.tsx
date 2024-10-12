@@ -70,7 +70,7 @@ export default function ToolbarPlugin() {
 	if (editor.isEditable()) {
 		return (
 			<div
-				className='z-10 flex flex-col rounded font-sans gap-2 px-4 py-2 m-2 bg-gray-600 bg-opacity-50 text-white align-baseline'
+				className='animate-fade-in z-10 flex flex-col rounded font-sans gap-2 px-4 py-2 m-2 bg-gray-600 bg-opacity-50 text-white align-baseline'
 				ref={toolbarRef}
 			>
 				<span className='text-sm md:text-xs'>Formatting</span>

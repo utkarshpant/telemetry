@@ -52,17 +52,21 @@ export default function Story() {
 		return (
 			<div className='w-full h-full flex flex-col gap-0'>
 				<div
-					aria-label='Title'
-					className='text-6xl p-4 w-full font-heading animate-fade-in m-auto mt-2 py-6 bg-neutral-950 border border-transparent hover:border hover:border-b-white hover:border-opacity-50 break-words'
-					contentEditable={false}
-					>
-						{loaderData.story.title}
-					</div>
-				<div className='relative h-full w-full m-auto' id='editor-container'>
+					className='relative h-full w-full m-auto md:px-12'
+					id='editor-container'
+				>
 					<LexicalEditor
 						initialContent={loaderData.story.content}
 						allowEdits={loaderData.allowEdits}
-					/>
+					>
+						{/* <textarea
+							aria-label='Title'
+							className='text-4xl w-full p-4 font-heading resize-y animate-fade-in m-auto mt-2 py-6 bg-neutral-950 border border-transparent hover:border hover:border-b-white hover:border-opacity-50 break-words'
+							disabled={!loaderData.allowEdits}
+							defaultValue={loaderData.story.title}
+						>
+						</textarea> */}
+					</LexicalEditor>
 				</div>
 			</div>
 		);

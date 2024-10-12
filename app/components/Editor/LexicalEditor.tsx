@@ -6,11 +6,13 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { ClientOnly } from 'remix-utils/client-only';
 import ToolbarPlugin from './ToolbarPlugin';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
+import { $createHeadingNode, HeadingNode, QuoteNode } from '@lexical/rich-text';
 import TreeViewPlugin from './TreeViewPlugin';
 import { useRouteLoaderData, useSearchParams } from '@remix-run/react';
 import { StoryLoaderData } from '~/routes/story.$storyId';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { ReactNode } from 'react';
+import { $createTitleNode, TitleNode } from './nodes/TitleNode';
 
 const theme: EditorThemeClasses = {
 	// Define your theme here
@@ -34,7 +36,13 @@ function onError(error: Error) {
 	console.error(error);
 }
 
-export default function Editor({ allowEdits }: { allowEdits: boolean }) {
+export default function Editor({
+	allowEdits,
+	children,
+}: {
+	allowEdits: boolean;
+	children: ReactNode;
+}) {
 	const [searchParams] = useSearchParams();
 	const storyData = useRouteLoaderData('routes/story.$storyId') as StoryLoaderData;
 
@@ -44,8 +52,11 @@ export default function Editor({ allowEdits }: { allowEdits: boolean }) {
 			const { story } = storyData;
 			if (root.getFirstChild() === null) {
 				if (story) {
+					const title = $createTitleNode();
+					title.append($createTextNode(story.title));
 					const para = $createParagraphNode();
 					para.append($createTextNode(story.content));
+					root.append(title);
 					root.append(para);
 				} else {
 					const para = $createParagraphNode();
@@ -57,7 +68,13 @@ export default function Editor({ allowEdits }: { allowEdits: boolean }) {
 	};
 
 	return (
-		<ClientOnly fallback={<div>Loading...</div>}>
+		<ClientOnly
+			fallback={
+				<div className='w-full h-full flex items-center justify-center animate-fade-in'>
+					Loading...
+				</div>
+			}
+		>
 			{() => (
 				<LexicalComposer
 					initialConfig={{
@@ -66,9 +83,10 @@ export default function Editor({ allowEdits }: { allowEdits: boolean }) {
 						editorState: $prepopulatedRichText,
 						onError,
 						editable: true,
-						nodes: [HeadingNode, QuoteNode],
+						nodes: [HeadingNode, QuoteNode, TitleNode],
 					}}
 				>
+					{children}
 					<ToolbarPlugin />
 					<OnChangePlugin
 						onChange={(editorState, editor) => {
@@ -80,7 +98,7 @@ export default function Editor({ allowEdits }: { allowEdits: boolean }) {
 					/>
 					<RichTextPlugin
 						contentEditable={
-							<ContentEditable className='p-4 w-full h-full text-white border-none focus:outline-none text-2xl md:text-xl font-serif text-left' />
+							<ContentEditable className='animate-fade-in p-4 w-full h-full text-white border-none focus:outline-none text-2xl md:text-xl font-serif text-left' />
 						}
 						placeholder={
 							<div className='pointer-events-none absolute top-28 mt-3 md:top-24 left-4 text text-opacity-45 text-2xl font-serif'>
