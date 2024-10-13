@@ -4,20 +4,21 @@
  * A 200 OK response indicates updates were successful.
  */
 
-import { json, type LoaderFunction } from '@remix-run/node';
+import { ActionFunction, json } from '@remix-run/node';
 import { prisma } from '../../prisma/db.server';
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { useState } from 'react';
 import EditMaterialIcon from '../assets/edit-material-icon.svg?url';
 // import { useFetcher } from '@remix-run/react';
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const action: ActionFunction = async ({ request, params }) => {
 	const session = await validateRequestAndReturnSession(request);
 	if (!session) {
 		return json({ message: 'Unauthorized' }, { status: 401 });
 	}
 	const { storyId } = params;
-	const updates = await request.json();
+	const updates = Object.fromEntries((await request.formData()).entries());
+	console.log(updates);
 	try {
 		await prisma.story.update({
 			where: {
@@ -29,9 +30,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 				},
 			},
 			data: {
-				...(updates.title && { title: updates.title }),
-				...(updates.content && { content: updates.content }),
-				...json(updates.subtitle && { subtitle: updates.subtitle }),
+				...(updates.title && { title: updates.title as string }),
+				...(updates.content && { content: updates.content as string }),
+				...(updates.subtitle && { subtitle: updates.subtitle as string }),
 			},
 		});
 		return json(200);

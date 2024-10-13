@@ -55,10 +55,7 @@ export default function Story() {
 					className='relative h-full w-full m-auto md:px-12'
 					id='editor-container'
 				>
-					<LexicalEditor
-						initialContent={loaderData.story.content}
-						allowEdits={loaderData.allowEdits}
-					>
+					<LexicalEditor>
 						{/* <textarea
 							aria-label='Title'
 							className='text-4xl w-full p-4 font-heading resize-y animate-fade-in m-auto mt-2 py-6 bg-neutral-950 border border-transparent hover:border hover:border-b-white hover:border-opacity-50 break-words'

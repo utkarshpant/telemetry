@@ -3,19 +3,13 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $findMatchingParent, mergeRegister } from '@lexical/utils';
 import {
 	$createParagraphNode,
-	$createTextNode,
-	$getRoot,
 	$getSelection,
 	$isRangeSelection,
 	$isRootOrShadowRoot,
-	COMMAND_PRIORITY_CRITICAL,
 	FORMAT_TEXT_COMMAND,
 	INSERT_PARAGRAPH_COMMAND,
-	KEY_ARROW_DOWN_COMMAND,
 	KEY_ENTER_COMMAND,
-	KEY_SPACE_COMMAND,
 	SELECTION_CHANGE_COMMAND,
-	TextNode,
 } from 'lexical';
 import {
 	$createHeadingNode,
@@ -25,8 +19,6 @@ import {
 } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
 import { useCallback, useRef, useState, useEffect } from 'react';
-import { $isTitleNode, TitleNode } from './nodes/TitleNode';
-import { INSERT_EMBED_COMMAND } from '@lexical/react/LexicalAutoEmbedPlugin';
 
 export default function ToolbarPlugin() {
 	const [editor] = useLexicalComposerContext();
@@ -89,7 +81,7 @@ export default function ToolbarPlugin() {
 					return false;
 				},
 				4
-			),
+			)
 		);
 	}, [editor, $updateToolbar]);
 
@@ -140,7 +132,7 @@ export default function ToolbarPlugin() {
 								const selection = $getSelection();
 								if ($isRangeSelection(selection)) {
 									if (!isHeading) {
-										$setBlocksType(selection, () => $createHeadingNode('h1'));
+										$setBlocksType(selection, () => $createHeadingNode('h2'));
 									} else {
 										$setBlocksType(selection, () => $createParagraphNode());
 									}

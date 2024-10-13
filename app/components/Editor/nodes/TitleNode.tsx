@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-    $createParagraphNode,
+	$createParagraphNode,
+	DOMConversionMap,
 	DOMExportOutput,
 	EditorConfig,
-	ElementFormatType,
 	ElementNode,
 	LexicalEditor,
 	LexicalNode,
@@ -29,7 +29,8 @@ export class TitleNode extends ElementNode {
 
 	createDOM(_config: EditorConfig, _editor: LexicalEditor): HTMLElement {
 		const title = document.createElement('h1');
-		title.classList.add('text-6xl', 'my-4', 'font-heading');
+		title.id = 'title';
+		title.className = 'editor-heading-1';
 		return title;
 	}
 
@@ -42,6 +43,24 @@ export class TitleNode extends ElementNode {
 		title.classList.add('text-4xl');
 		return { element: title };
 	}
+
+	static importDOM?: (() => DOMConversionMap | null) | undefined = () => {
+		return {
+			h1: (node: Node) => ({
+				conversion: (domNode: Node) => {
+					const nodeName = domNode.nodeName.toLowerCase();
+					if (nodeName === 'h1') {
+						const node = $createTitleNode();
+						return {
+							node,
+						};
+					}
+					return null;
+				},
+				priority: 1,
+			}),
+		};
+	};
 
 	insertNewAfter(selection: RangeSelection, restoreSelection?: boolean): null | ParagraphNode {
 		const newElement = $createParagraphNode();
