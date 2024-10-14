@@ -61,7 +61,6 @@ export default function Editor({ children }: { children?: ReactNode }) {
 			}
 		}
 	};
-
 	return (
 		<ClientOnly
 			fallback={
@@ -84,23 +83,24 @@ export default function Editor({ children }: { children?: ReactNode }) {
 					}}
 				>
 					{children}
-						<div className='flex flex-col min-h-full w-full'>
-							{storyData.allowEdits ? <ToolbarPlugin /> : null} 
-							<RichTextPlugin
-								contentEditable={
-									<ContentEditable className='animate-fade-in px-4 w-full h-ful border-none focus:outline-none text-2xl md:text-xl font-serif text-left' />
-								}
-								placeholder={
-									<div className='pointer-events-none absolute top-28 mt-3 md:top-24 left-4 text text-opacity-45 text-2xl font-serif'>
-										Enter some text...
-									</div>
-								}
-								ErrorBoundary={LexicalErrorBoundary}
-							/>
-						</div>
-						<div className='h-full w-full md:w-1/3'>
-							<EditorialPlugin />
-						</div>
+					<div className='flex flex-col min-h-full w-full'>
+						{storyData.allowEdits ? <ToolbarPlugin /> : null}
+						<RichTextPlugin
+							contentEditable={
+								<ContentEditable className='animate-fade-in px-4 w-full h-ful border-none focus:outline-none text-2xl md:text-xl font-serif text-left' />
+							}
+							placeholder={
+								<div className='pointer-events-none absolute top-28 mt-3 md:top-24 left-4 text text-opacity-45 text-2xl font-serif'>
+									Enter some text...
+								</div>
+							}
+							ErrorBoundary={LexicalErrorBoundary}
+						/>
+						{searchParams.get('debug') === 'true' && <TreeViewPlugin />}
+					</div>
+					<div className='h-full w-full md:w-1/3'>
+						<EditorialPlugin />
+					</div>
 					{/* <div className='flex flex-col md:flex-row gap-0'>
 					</div> */}
 					<OnChangePlugin
@@ -129,7 +129,6 @@ export default function Editor({ children }: { children?: ReactNode }) {
 						}}
 						ignoreSelectionChange
 					/>
-					{searchParams.get('debug') === 'true' && <TreeViewPlugin />}
 					<HistoryPlugin />
 				</LexicalComposer>
 			)}

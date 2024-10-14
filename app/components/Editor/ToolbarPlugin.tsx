@@ -24,6 +24,7 @@ import { StoryLoaderData } from '~/routes/story_.$storyId';
 
 export default function ToolbarPlugin() {
 	const [editor] = useLexicalComposerContext();
+	const [editable, setIsEditable] = useState(false);
 	const toolbarRef = useRef<HTMLDivElement>(null);
 	const [isBold, setIsBold] = useState(false);
 	const [isItalic, setIsItalic] = useState(false);
@@ -56,6 +57,9 @@ export default function ToolbarPlugin() {
 
 	useEffect(() => {
 		return mergeRegister(
+			editor.registerEditableListener((editable) => {
+				setIsEditable(editable);
+			}),
 			editor.registerUpdateListener(({ editorState }) => {
 				editorState.read(() => {
 					$updateToolbar();
@@ -88,13 +92,13 @@ export default function ToolbarPlugin() {
 		);
 	}, [editor, $updateToolbar]);
 
-	if (editor.isEditable()) {
+	if (editable) {
 		return (
 			<div
 				className='sticky top-4 animate-fade-in z-10 flex flex-col rounded font-sans gap-2 px-4 py-2 mx-4 bg-gray-600 text-white align-baseline'
 				ref={toolbarRef}
 			>
-				<span className='text-sm md:text-xs'>Formatting</span>
+				<span className='text-sm md:text-xs'>Formatting ({String(editor._editable)})</span>
 				<hr className='border-gray-500' />
 				<div>
 					<button
