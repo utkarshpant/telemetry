@@ -61,7 +61,7 @@ export default function EditorialPlugin() {
 					) : null}
 					<button
 						type='button'
-						className={`w-56 px-4 py-2 rounded ${
+						className={`w-full md:w-56 px-4 py-2 rounded ${
 							editor.isEditable() ? 'bg-green-700' : 'bg-sky-800'
 						} text-white`}
 						onClick={() => {
@@ -94,7 +94,7 @@ export default function EditorialPlugin() {
 					<button
 						type='button'
 						title='publish'
-						className={`w-56 px-4 py-2 ${
+						className={`w-full md:w-56 px-4 py-2 ${
 							loaderData.story.isPublished ? 'bg-orange-600' : 'bg-green-600'
 						} text-white rounded`}
 						onClick={() => {

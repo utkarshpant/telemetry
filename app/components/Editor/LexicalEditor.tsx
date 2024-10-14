@@ -85,6 +85,11 @@ export default function Editor({ children }: { children?: ReactNode }) {
 					{children}
 					<div className='flex flex-col min-h-full w-full'>
 						{storyData.allowEdits ? <ToolbarPlugin /> : null}
+						<span className='animate-fade-in font-semibold px-4'>
+							{storyData.story.isPublished && storyData.story.publishedAt
+								? new Date(storyData.story.publishedAt).toLocaleDateString()
+								: null}
+						</span>
 						<RichTextPlugin
 							contentEditable={
 								<ContentEditable className='animate-fade-in px-4 w-full h-ful border-none focus:outline-none text-2xl md:text-xl font-serif text-left' />
