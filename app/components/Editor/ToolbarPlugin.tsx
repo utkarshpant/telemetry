@@ -95,7 +95,7 @@ export default function ToolbarPlugin() {
 	if (editable) {
 		return (
 			<div
-				className='sticky top-4 animate-fade-in z-10 flex flex-col rounded font-sans gap-2 px-4 py-2 mx-4 bg-gray-600 text-white align-baseline'
+				className='sticky top-4 animate-fade-in z-10 flex flex-col rounded font-sans gap-2 px-4 py-2 w-full md:w-8/12 md:mx-auto bg-gray-950 dark:bg-gray-600 text-white align-baseline'
 				ref={toolbarRef}
 			>
 				<span className='text-sm md:text-xs'>Formatting</span>

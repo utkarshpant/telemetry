@@ -85,14 +85,9 @@ export default function Editor({ children }: { children?: ReactNode }) {
 					{children}
 					<div className='flex flex-col min-h-full w-full'>
 						{storyData.allowEdits ? <ToolbarPlugin /> : null}
-						<span className='animate-fade-in font-semibold px-4'>
-							{storyData.story.isPublished && storyData.story.publishedAt
-								? new Date(storyData.story.publishedAt).toLocaleDateString()
-								: null}
-						</span>
 						<RichTextPlugin
 							contentEditable={
-								<ContentEditable className='animate-fade-in px-4 w-full h-ful border-none focus:outline-none text-2xl md:text-xl font-serif text-left' />
+								<ContentEditable className={`animate-fade-in px-4 w-full md:w-8/12 md:mx-auto h-full border-none focus:outline-none text-2xl md:text-xl font-serif text-left`} />
 							}
 							placeholder={
 								<div className='pointer-events-none absolute top-28 mt-3 md:top-24 left-4 text text-opacity-45 text-2xl font-serif'>
@@ -103,7 +98,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 						/>
 						{searchParams.get('debug') === 'true' && <TreeViewPlugin />}
 					</div>
-					<div className='h-full w-full md:w-1/3'>
+					<div className={`h-full w-full md:w-1/3`}>
 						<EditorialPlugin />
 					</div>
 					{/* <div className='flex flex-col md:flex-row gap-0'>
