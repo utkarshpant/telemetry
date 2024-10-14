@@ -19,6 +19,8 @@ import {
 } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
 import { useCallback, useRef, useState, useEffect } from 'react';
+import { useFetcher, useRouteLoaderData } from '@remix-run/react';
+import { StoryLoaderData } from '~/routes/story_.$storyId';
 
 export default function ToolbarPlugin() {
 	const [editor] = useLexicalComposerContext();
@@ -29,6 +31,7 @@ export default function ToolbarPlugin() {
 	const [isStrikethrough, setIsStrikethrough] = useState(false);
 	const [isHeading, setIsHeading] = useState(false);
 	const [isQuote, setIsQuote] = useState(false);
+	const storyData = useRouteLoaderData('routes/story_.$storyId') as unknown as StoryLoaderData;
 
 	const $updateToolbar = useCallback(() => {
 		const selection = $getSelection();
@@ -88,7 +91,7 @@ export default function ToolbarPlugin() {
 	if (editor.isEditable()) {
 		return (
 			<div
-				className='sticky top-2 animate-fade-in z-10 flex flex-col rounded font-sans gap-2 px-4 py-2 m-2 bg-gray-600 text-white align-baseline'
+				className='sticky top-4 animate-fade-in z-10 flex flex-col rounded font-sans gap-2 px-4 py-2 mx-4 bg-gray-600 text-white align-baseline'
 				ref={toolbarRef}
 			>
 				<span className='text-sm md:text-xs'>Formatting</span>
@@ -105,7 +108,7 @@ export default function ToolbarPlugin() {
 					<button
 						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
 						className={`${
-							isItalic ? 'bg-slate-600' : ''
+							isItalic ? 'bg-white bg-opacity-15' : ''
 						} italic rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 text-white align-middle`}
 					>
 						I
@@ -113,7 +116,7 @@ export default function ToolbarPlugin() {
 					<button
 						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
 						className={`line-through decoration-white rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 text-white align-middle ${
-							isStrikethrough ? 'bg-slate-600' : ''
+							isStrikethrough ? 'bg-white bg-opacity-15' : ''
 						}`}
 					>
 						S
@@ -121,7 +124,7 @@ export default function ToolbarPlugin() {
 					<button
 						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
 						className={`underline decoration-white rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 text-white align-middle ${
-							isUnderline ? 'bg-slate-600' : ''
+							isUnderline ? 'bg-white bg-opacity-15' : ''
 						}`}
 					>
 						U

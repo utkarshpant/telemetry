@@ -61,7 +61,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	const user = await prisma.user
 		.findFirst({
 			where: {
-				OR: [{ email: emailOrUsername }, { username: emailOrUsername }],
+				OR: [{ email: emailOrUsername.toLowerCase() }, { username: emailOrUsername.toLowerCase() }],
 			},
 			include: {
 				credentials: true,
@@ -178,7 +178,7 @@ export default function SignIn() {
 					></PasswordInput>
 				</label>
 				{actionData ? (
-					<p className='text-white text-xs'>{actionData ? actionData.message : null}</p>
+					<p className='text-xs'>{actionData ? actionData.message : null}</p>
 				) : null}
 				<button
 					type='submit'

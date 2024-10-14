@@ -1,8 +1,9 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
-import type { LinksFunction, LoaderFunction } from '@remix-run/node';
+import { json, Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
 
 import stylesheet from './tailwind.css?url';
 import { validateRequestAndReturnSession } from './auth/utils.server';
+import { User } from '@prisma/client';
 
 export const links: LinksFunction = () => [
 	{ rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -13,11 +14,7 @@ export const links: LinksFunction = () => [
 	},
 	{
 		rel: 'stylesheet',
-		href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
-	},
-	{
-		rel: 'stylesheet',
-		href: 'https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=erode@1,2&display=swap',
+		href: 'https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=erode@1,2&f[]=supreme@1,2&display=swap',
 	},
 	{
 		rel: 'stylesheet',
@@ -25,20 +22,13 @@ export const links: LinksFunction = () => [
 	},
 ];
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const session = await validateRequestAndReturnSession(request);
-	if (session) {
-		return {
-			user: session.get('user'),
-			signedIn: true,
-		}
-	} else {
-		return {
-			user: null,
-			signedIn: false,
-		}
-	}
-}
+	return json({
+		user: session?.has('user') ? (session.get('user') as User) : null,
+		signedIn: session ? true : false,
+	});
+};
 
 export function Layout({ children }: { children: React.ReactNode }) {
 	return (

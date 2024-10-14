@@ -40,7 +40,7 @@ export const action: ActionFunction = async ({ request }) => {
 	const user = await prisma.user
 		.findFirst({
 			where: {
-				OR: [{ email: email }, { username: username }],
+				OR: [{ email: email.toLowerCase() }, { username: username.toLowerCase() }],
 			},
 		})
 		.catch((error) => {
@@ -233,13 +233,13 @@ export default function SignUp() {
 						required
 					></PasswordInput>
 					{validationMessage ? (
-						<p className='text-white mt-2 text-xs'>{validationMessage}</p>
+						<p className='mt-2 text-xs'>{validationMessage}</p>
 					) : null}
 				</label>
 			</div>
 			{/* Row 5 */}
 			<div className='w-full flex flex-col'>
-				{actionData ? <p className='text-white text-xs'>{actionData.message}</p> : null}
+				{actionData ? <p className='text-xs'>{actionData.message}</p> : null}
 				<button
 					type='submit'
 					className='p-2 bg-cyan-950 w-full mt-4 text-white rounded'

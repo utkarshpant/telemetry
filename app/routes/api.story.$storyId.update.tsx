@@ -7,9 +7,6 @@
 import { ActionFunction, json } from '@remix-run/node';
 import { prisma } from '../../prisma/db.server';
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
-import { useState } from 'react';
-import EditMaterialIcon from '../assets/edit-material-icon.svg?url';
-// import { useFetcher } from '@remix-run/react';
 
 export const action: ActionFunction = async ({ request, params }) => {
 	const session = await validateRequestAndReturnSession(request);
@@ -18,7 +15,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 	}
 	const { storyId } = params;
 	const updates = Object.fromEntries((await request.formData()).entries());
-	console.log(updates);
 	try {
 		await prisma.story.update({
 			where: {
@@ -42,39 +38,3 @@ export const action: ActionFunction = async ({ request, params }) => {
 		}
 	}
 };
-
-export function EditableTitle({
-	editable,
-	defaultValue,
-}: {
-	editable: boolean;
-	defaultValue: string;
-}) {
-	// const fetcher = useFetcher();
-	const [allowEdits, setAllowEdits] = useState<boolean>(false);
-	const postIsEditable = editable && allowEdits;
-	return (
-		<div className='flex flex-row items-baseline'>
-			<button
-				className='hover:bg-neutral-700 rounded'
-				onClick={() => {
-					setAllowEdits(!allowEdits);
-				}}
-			>
-				<img
-					alt='Edit title'
-					src={EditMaterialIcon}
-				></img>
-			</button>
-			<input
-				className={`text-6xl ${postIsEditable ? 'border-b-white' : 'border-b-transparent'}`}
-				aria-label='Editable title'
-				disabled={!editable || !allowEdits}
-				defaultValue={defaultValue}
-				onChange={(e) => {
-					console.log(e.target.value);
-				}}
-			></input>
-		</div>
-	);
-}
