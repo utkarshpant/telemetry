@@ -3,7 +3,7 @@
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { prisma } from 'prisma/db.server';
 import { json, type LoaderFunctionArgs } from '@remix-run/node';
-import { isRouteErrorResponse, useLoaderData, useRouteError } from '@remix-run/react';
+import { isRouteErrorResponse, useRouteError } from '@remix-run/react';
 import { type Story } from '@prisma/client';
 import LexicalEditor from './../components/Editor/LexicalEditor';
 
@@ -20,7 +20,7 @@ export type StoryLoaderData = {
 			};
 		}[];
 	};
-	allowEdits: boolean;
+	allowEdits: boolean;x
 }
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {

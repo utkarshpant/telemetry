@@ -29,6 +29,11 @@ export const action: ActionFunction = async ({ request, params }) => {
 				...(updates.title && { title: updates.title as string }),
 				...(updates.content && { content: updates.content as string }),
 				...(updates.subtitle && { subtitle: updates.subtitle as string }),
+				...(updates.isPublished && {
+					isPublished: updates.isPublished === 'true',
+					publishedAt: new Date(),
+				}),
+				...(!updates.isPublished && { publishedAt: null }), // when unpublished, reset the publishedAt field
 			},
 		});
 		return json(200);
