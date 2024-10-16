@@ -27,7 +27,7 @@ export function SignOut() {
 	return (
 		<button
 			type='button'
-			className='underline text-white'
+			className='bg-transparent dark:text-white text-neutral-950 px-4 py-1 text-base'
 			onClick={() => {
 				signOutFetcher.submit(null, {
 					method: 'post',
@@ -35,7 +35,7 @@ export function SignOut() {
 				});
 			}}
 		>
-			{signOutFetcher.state === 'submitting' ? 'Signing you out...' : 'Sign out.'}
+			{signOutFetcher.state === 'submitting' ? 'Signing you out...' : 'Sign out'}
 		</button>
 	);
 }

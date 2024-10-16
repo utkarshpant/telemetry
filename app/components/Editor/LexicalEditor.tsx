@@ -1,4 +1,11 @@
-import { $getRoot, $insertNodes, LexicalEditor, type EditorThemeClasses } from 'lexical';
+import {
+	$createParagraphNode,
+	$createTextNode,
+	$getRoot,
+	$insertNodes,
+	LexicalEditor,
+	type EditorThemeClasses,
+} from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -11,11 +18,13 @@ import TreeViewPlugin from './TreeViewPlugin';
 import { useRouteLoaderData, useSearchParams } from '@remix-run/react';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { ReactNode } from 'react';
-import { TitleNode } from './nodes/TitleNode';
+import { $createTitleNode, TitleNode } from './nodes/TitleNode';
 import { useDebounceFetcher } from 'remix-utils/use-debounce-fetcher';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import EditorialPlugin from './EditorialPlugin';
 import { StoryLoaderData } from '~/routes/story_.$storyId';
+import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { ListNode, ListItemNode } from '@lexical/list';
 
 const theme: EditorThemeClasses = {
 	// Define your theme here
@@ -34,6 +43,7 @@ const theme: EditorThemeClasses = {
 		h1: 'editor-heading-1',
 	},
 	quote: 'quote',
+	placeholder: 'placeholder',
 };
 
 function onError(error: Error) {
@@ -50,14 +60,22 @@ export default function Editor({ children }: { children?: ReactNode }) {
 		if ('story' in storyData) {
 			const { story } = storyData;
 			if (root.getFirstChild() === null) {
-				if (story) {
-					// append title and content nodes;
-					const parser = new DOMParser();
-					const dom = parser.parseFromString(story.content, 'text/html');
-					const nodes = $generateNodesFromDOM(editor, dom);
-					root.select();
-					$insertNodes(nodes);
+				// append title and content nodes;
+				if (!story.title) {
+					const titleNode = $createTitleNode().append($createTextNode('Untitled.'));
+					root.append(titleNode);
 				}
+				if (!story.content) {
+					const placeholderContent = $createParagraphNode().append(
+						$createTextNode('Start typing here...').setMode('token')
+					);
+					root.append(placeholderContent);
+				}
+				const parser = new DOMParser();
+				const dom = parser.parseFromString(story.content, 'text/html');
+				const nodes = $generateNodesFromDOM(editor, dom);
+				root.select();
+				$insertNodes(nodes);
 			}
 		}
 	};
@@ -79,7 +97,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 						},
 						onError,
 						editable: false,
-						nodes: [HeadingNode, QuoteNode, TitleNode],
+						nodes: [HeadingNode, QuoteNode, TitleNode, ListNode, ListItemNode],
 					}}
 				>
 					{children}
@@ -87,7 +105,9 @@ export default function Editor({ children }: { children?: ReactNode }) {
 						{storyData.allowEdits ? <ToolbarPlugin /> : null}
 						<RichTextPlugin
 							contentEditable={
-								<ContentEditable className={`animate-fade-in px-4 w-full md:w-8/12 md:mx-auto h-full border-none focus:outline-none text-2xl md:text-xl font-serif text-left`} />
+								<ContentEditable
+									className={`animate-fade-in px-8 lg:p-0 py-4 w-full md:mx-auto h-full border-none focus:outline-none text-2xl md:text-xl font-serif text-left`}
+								/>
 							}
 							placeholder={
 								<div className='pointer-events-none absolute top-28 mt-3 md:top-24 left-4 text text-opacity-45 text-2xl font-serif'>
@@ -96,6 +116,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 							}
 							ErrorBoundary={LexicalErrorBoundary}
 						/>
+						<ListPlugin />
 						{searchParams.get('debug') === 'true' && <TreeViewPlugin />}
 					</div>
 					<div className={`h-full w-full md:w-1/3`}>
@@ -111,19 +132,19 @@ export default function Editor({ children }: { children?: ReactNode }) {
 									.filter((node) => node.getType() === 'title');
 								if (titleNodes.length > 0) {
 									const titleNode = titleNodes[0];
-									if ('story' in storyData) {
-										// content changed
-										const formData = new FormData();
-										const html = $generateHtmlFromNodes(editor);
-										formData.append('content', html);
-										formData.append('title', titleNode?.getTextContent() || '');
-										debouncedFetcher.submit(formData, {
-											method: 'POST',
-											action: `/api/story/${storyData.story.id}/update`,
-											debounceTimeout: 1000,
-											fetcherKey: 'story-update',
-										});
-									}
+									// content changed
+									const formData = new FormData();
+									const html = $generateHtmlFromNodes(editor);
+									const wordCount = $getRoot().getTextContent().split(/\s+/).length;
+									formData.append('content', html);
+									formData.append('title', titleNode?.getTextContent() || '');
+									formData.append('wordCount', wordCount.toString());
+									debouncedFetcher.submit(formData, {
+										method: 'POST',
+										action: `/api/story/${storyData.story.id}/update`,
+										debounceTimeout: 1000,
+										fetcherKey: 'story-update',
+									});
 								}
 							});
 						}}

@@ -31,9 +31,9 @@ export const action: ActionFunction = async ({ request, params }) => {
 				...(updates.subtitle && { subtitle: updates.subtitle as string }),
 				...(updates.isPublished && {
 					isPublished: updates.isPublished === 'true',
-					publishedAt: new Date(),
+					publishedAt: updates.isPublished === 'true' ? new Date() : null,
 				}),
-				...(!updates.isPublished && { publishedAt: null }), // when unpublished, reset the publishedAt field
+				...(updates.wordCount && { wordCount: Number(updates.wordCount) }),
 			},
 		});
 		return json(200);

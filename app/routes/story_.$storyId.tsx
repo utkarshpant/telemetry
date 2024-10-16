@@ -6,6 +6,7 @@ import { json, type LoaderFunctionArgs } from '@remix-run/node';
 import { isRouteErrorResponse, useRouteError } from '@remix-run/react';
 import { type Story } from '@prisma/client';
 import LexicalEditor from './../components/Editor/LexicalEditor';
+import { getSampledStoriesWithAuthors, RandomStoryPreview } from './api.story.random';
 
 export type StoryLoaderData = {
 	story: Story & {
@@ -20,8 +21,9 @@ export type StoryLoaderData = {
 			};
 		}[];
 	};
-	allowEdits: boolean;x
-}
+	allowEdits: boolean;
+	totalViews: number;
+};
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	const session = await validateRequestAndReturnSession(request);
@@ -48,8 +50,42 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 				},
 			},
 		});
+
+		const totalViews = await prisma.storyViews.aggregate({
+			where: {
+				storyId: Number(storyId),
+			},
+			_sum: {
+				count: true,
+			},
+		});
+		if (
+			!session?.has('userId') ||
+			story.authors.some((author) => author.userId !== session.get('userId'))
+		) {
+			prisma.storyViews
+				.upsert({
+					where: {
+						storyId_date: {
+							storyId: Number(storyId),
+							date: new Date(),
+						},
+					},
+					update: {
+						count: {
+							increment: 1,
+						},
+					},
+					create: {
+						storyId: Number(storyId),
+						date: new Date(),
+						count: 1,
+					},
+				});
+		}
 		return json({
 			story,
+			totalViews: totalViews._sum.count ? totalViews._sum.count + 1 : 0,
 			allowEdits: story.authors.some((author) => author.userId === session?.get('userId')),
 		});
 	} catch {
@@ -59,7 +95,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export default function Story() {
 	return (
-		<div className={`w-full min-h-screen flex flex-col md:flex-row gap-4 md:py-12 pt-4 md:px-12 relative justify-between`}>
+		<div
+			className={`w-full min-h-screen flex flex-col md:flex-row gap-4 md:py-12 pt-4 md:px-12 relative justify-between`}
+		>
 			<LexicalEditor></LexicalEditor>
 		</div>
 	);
@@ -67,14 +105,13 @@ export default function Story() {
 
 export function ErrorBoundary() {
 	const error = useRouteError();
-
 	if (isRouteErrorResponse(error)) {
 		return (
 			<div className='p-12'>
 				<h1 className='text-6xl'>
 					{error.status} {error.statusText}
 				</h1>
-				<p className='my-2'>{error.data}</p>
+				<p className='my-4'>{error.data}</p>
 			</div>
 		);
 	} else if (error instanceof Error) {

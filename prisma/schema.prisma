@@ -19,6 +19,7 @@ model User {
     updatedAt         DateTime        @updatedAt
     sessions          Session[]
     stories           StoryAuthor[]
+    images            Image[]
     credentials       UserCredential?
 
     @@map("users")
@@ -31,6 +32,7 @@ model Story {
     content     String
     createdAt   DateTime      @default(now())
     updatedAt   DateTime      @updatedAt
+    wordCount   Int           @default(0)
     publishedAt DateTime?
     authors     StoryAuthor[]
     views       StoryViews[]
@@ -59,6 +61,19 @@ model StoryAuthor {
 
     @@id([storyId, userId]) // Composite primary key
     @@map("story_authors")
+}
+
+model Image {
+    id         String  @id @default(uuid())
+    externalId String
+    url        String
+    alt        String?
+    ownerId    Int
+    owner      User    @relation(fields: [ownerId], references: [id])
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    @@map("images")
 }
 
 model UserCredential {

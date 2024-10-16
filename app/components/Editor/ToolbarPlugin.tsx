@@ -3,6 +3,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $findMatchingParent, mergeRegister } from '@lexical/utils';
 import {
 	$createParagraphNode,
+	$createTextNode,
 	$getSelection,
 	$isRangeSelection,
 	$isRootOrShadowRoot,
@@ -10,6 +11,7 @@ import {
 	INSERT_PARAGRAPH_COMMAND,
 	KEY_ENTER_COMMAND,
 	SELECTION_CHANGE_COMMAND,
+	TextNode,
 } from 'lexical';
 import {
 	$createHeadingNode,
@@ -19,7 +21,7 @@ import {
 } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
 import { useCallback, useRef, useState, useEffect } from 'react';
-import { useFetcher, useRouteLoaderData } from '@remix-run/react';
+import { useRouteLoaderData } from '@remix-run/react';
 import { StoryLoaderData } from '~/routes/story_.$storyId';
 
 export default function ToolbarPlugin() {
@@ -32,7 +34,7 @@ export default function ToolbarPlugin() {
 	const [isStrikethrough, setIsStrikethrough] = useState(false);
 	const [isHeading, setIsHeading] = useState(false);
 	const [isQuote, setIsQuote] = useState(false);
-	const storyData = useRouteLoaderData('routes/story_.$storyId') as unknown as StoryLoaderData;
+	const [isSuperscript, setIsSuperscript] = useState(false);
 
 	const $updateToolbar = useCallback(() => {
 		const selection = $getSelection();
@@ -41,6 +43,7 @@ export default function ToolbarPlugin() {
 			setIsItalic(selection.hasFormat('italic'));
 			setIsUnderline(selection.hasFormat('underline'));
 			setIsStrikethrough(selection.hasFormat('strikethrough'));
+			setIsSuperscript(selection.hasFormat('superscript'));
 
 			const anchorNode = selection.anchor.getNode();
 			const element = $findMatchingParent(anchorNode, (e) => {
@@ -88,7 +91,34 @@ export default function ToolbarPlugin() {
 					return false;
 				},
 				4
-			)
+			),
+			editor.registerNodeTransform(TextNode, (textNode) => {
+				/**
+				 * if the last character is a space, check if the 3 characters before the space match "\d{1, 3}th".
+				 * If they do, remove these 3 characters before the space, insert a new ElementNode, insert one TextNode with the number and another with the "th".
+				 * Then, apply the superscript format to the "th" TextNode.
+				 */
+
+				const textContent = textNode.getTextContent();
+				const lastChar = textContent[textContent.length - 1];
+				if (lastChar === ' ') {
+					const match = textContent.trim().match(/(\d{1,3})th$/);
+					if (match) {
+						const [fullMatch, number] = match;
+						const index = textContent.lastIndexOf(fullMatch);
+						const before = textContent.slice(0, index);
+						const numberNode = new TextNode(number);
+						const suffixNode = new TextNode('th');
+						suffixNode.setFormat('superscript');
+						textNode.setTextContent(before);
+						textNode.insertAfter(numberNode);
+						const spaceNode = $createTextNode(' ');
+						numberNode.insertAfter(suffixNode);
+						suffixNode.insertAfter(spaceNode);
+						spaceNode.selectNext();
+					}
+				}
+			})
 		);
 	}, [editor, $updateToolbar]);
 
@@ -170,6 +200,16 @@ export default function ToolbarPlugin() {
 						}`}
 					>
 						&quot;Quote&quot;
+					</button>
+					<button
+						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript')}
+						className={`rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 text-white align-middle ${
+							isSuperscript ? 'bg-white bg-opacity-15' : ''
+						}`}
+					>
+						<span>
+							X<sup>2</sup>
+						</span>
 					</button>
 				</div>
 			</div>
