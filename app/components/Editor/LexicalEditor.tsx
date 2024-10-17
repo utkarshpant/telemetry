@@ -23,8 +23,6 @@ import { useDebounceFetcher } from 'remix-utils/use-debounce-fetcher';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import EditorialPlugin from './EditorialPlugin';
 import { StoryLoaderData } from '~/routes/story_.$storyId';
-import { ListPlugin } from '@lexical/react/LexicalListPlugin';
-import { ListNode, ListItemNode } from '@lexical/list';
 
 const theme: EditorThemeClasses = {
 	// Define your theme here
@@ -35,6 +33,7 @@ const theme: EditorThemeClasses = {
 		bold: 'font-bold',
 		italic: 'italic',
 		base: 'text-left',
+		code: 'code'
 	},
 	root: 'text-left',
 	ltr: 'text-left',
@@ -44,6 +43,7 @@ const theme: EditorThemeClasses = {
 	},
 	quote: 'quote',
 	placeholder: 'placeholder',
+	code: 'code'
 };
 
 function onError(error: Error) {
@@ -97,11 +97,13 @@ export default function Editor({ children }: { children?: ReactNode }) {
 						},
 						onError,
 						editable: false,
-						nodes: [HeadingNode, QuoteNode, TitleNode, ListNode, ListItemNode],
+						nodes: [HeadingNode, QuoteNode, TitleNode],
 					}}
 				>
 					{children}
-					<div className='flex flex-col min-h-full w-full'>
+					<div
+						className='flex flex-col min-h-full w-full p-2'
+					>
 						{storyData.allowEdits ? <ToolbarPlugin /> : null}
 						<RichTextPlugin
 							contentEditable={
@@ -116,7 +118,6 @@ export default function Editor({ children }: { children?: ReactNode }) {
 							}
 							ErrorBoundary={LexicalErrorBoundary}
 						/>
-						<ListPlugin />
 						{searchParams.get('debug') === 'true' && <TreeViewPlugin />}
 					</div>
 					<div className={`h-full w-full md:w-1/3`}>
@@ -135,7 +136,9 @@ export default function Editor({ children }: { children?: ReactNode }) {
 									// content changed
 									const formData = new FormData();
 									const html = $generateHtmlFromNodes(editor);
-									const wordCount = $getRoot().getTextContent().split(/\s+/).length;
+									const wordCount = $getRoot()
+										.getTextContent()
+										.split(/\s+/).length;
 									formData.append('content', html);
 									formData.append('title', titleNode?.getTextContent() || '');
 									formData.append('wordCount', wordCount.toString());

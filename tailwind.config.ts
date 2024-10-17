@@ -17,6 +17,7 @@ export default {
 				],
 				serif: ['Erode'],
 				heading: ['Tanker', 'sans-serif'],
+				code: ['JetBrains Mono', 'serif'],
 			},
 			animation: {
         "fade-in": "fade-in 2s ease-in-out",
