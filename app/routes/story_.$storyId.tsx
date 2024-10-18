@@ -6,8 +6,6 @@ import { json, type LoaderFunctionArgs } from '@remix-run/node';
 import { isRouteErrorResponse, useRouteError } from '@remix-run/react';
 import { type Story } from '@prisma/client';
 import LexicalEditor from './../components/Editor/LexicalEditor';
-import { getSampledStoriesWithAuthors, RandomStoryPreview } from './api.story.random';
-import { motion } from 'framer-motion';
 
 export type StoryLoaderData = {
 	story: Story & {
@@ -97,7 +95,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 export default function Story() {
 	return (
 		<div
-			layout="size"
 			className={`w-full min-h-screen flex flex-col md:flex-row gap-4 md:py-12 md:px-12 relative justify-between`}
 		>
 			<LexicalEditor></LexicalEditor>

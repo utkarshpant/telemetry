@@ -1,5 +1,5 @@
 import { Story, User } from '@prisma/client';
-import { LoaderFunctionArgs } from '@remix-run/node';
+import { json, LoaderFunctionArgs } from '@remix-run/node';
 import { prisma } from 'prisma/db.server';
 
 export type RandomStoryPreview = {
@@ -88,6 +88,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const requestUrl = new URL(request.url);
 	const queryParams = new URLSearchParams(requestUrl.search);
 	const count = Number(queryParams.get('count'));
+    if (!count) {
+        return json({ message: 'Invalid count' }, { status: 400 });
+    }
 	try {
 		return await getSampledStoriesWithAuthors(count);
 	} catch (e) {

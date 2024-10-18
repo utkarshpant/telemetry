@@ -14,6 +14,18 @@ export const action: ActionFunction = async ({ request, params }) => {
 		return json({ message: 'Unauthorized' }, { status: 401 });
 	}
 	const { storyId } = params;
+	const storyAuthorRecord = await prisma.storyAuthor.findUnique({
+		where: {
+			storyId_userId: {
+				storyId: Number(storyId),
+				userId: session.get('userId') as number,
+			},
+		},
+	});
+	// currently logged in user is not an author of the story
+	if (!storyAuthorRecord) {
+		return json({ message: 'Unauthorized' }, { status: 401 });
+	}
 	const updates = Object.fromEntries((await request.formData()).entries());
 	try {
 		await prisma.story.update({
