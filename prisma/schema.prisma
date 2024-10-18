@@ -45,16 +45,16 @@ model StoryViews {
     storyId Int
     date    DateTime @default(now())
     count   Int      @default(0)
-    story   Story    @relation(fields: [storyId], references: [id])
+    story   Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
 
     @@id([storyId, date]) // Composite primary key
     @@map("story_views")
 }
 
 model StoryAuthor {
-    story     Story    @relation(fields: [storyId], references: [id])
+    story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
     storyId   Int
-    user      User     @relation(fields: [userId], references: [id])
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId    Int
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

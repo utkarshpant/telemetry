@@ -6,7 +6,8 @@
 
 import { ActionFunction, json } from '@remix-run/node';
 import { prisma } from '../../prisma/db.server';
-import { validateRequestAndReturnSession } from '~/auth/utils.server';
+import { commitSession, validateRequestAndReturnSession } from '~/auth/utils.server';
+import { redirect, useFetcher } from '@remix-run/react';
 
 export const action: ActionFunction = async ({ request, params }) => {
 	const session = await validateRequestAndReturnSession(request);
@@ -26,32 +27,56 @@ export const action: ActionFunction = async ({ request, params }) => {
 	if (!storyAuthorRecord) {
 		return json({ message: 'Unauthorized' }, { status: 401 });
 	}
-	const updates = Object.fromEntries((await request.formData()).entries());
-	try {
-		await prisma.story.update({
-			where: {
-				id: Number(storyId),
-				authors: {
-					some: {
-						userId: session.get('userId'),
+
+	if (request.method === 'DELETE') {
+		try {
+			await prisma.story.delete({
+				where: {
+					id: Number(storyId),
+				},
+			});
+			return redirect('/home?deletion=success');
+		} catch (e) {
+			if (e instanceof Error) {
+				return json({ message: e.message ?? 'Something went wrong.' }, { status: 500 });
+			}
+		}
+	} else {
+		const updates = Object.fromEntries((await request.formData()).entries());
+		try {
+			await prisma.story.update({
+				where: {
+					id: Number(storyId),
+					authors: {
+						some: {
+							userId: session.get('userId'),
+						},
 					},
 				},
-			},
-			data: {
-				...(updates.title && { title: updates.title as string }),
-				...(updates.content && { content: updates.content as string }),
-				...(updates.subtitle && { subtitle: updates.subtitle as string }),
-				...(updates.isPublished && {
-					isPublished: updates.isPublished === 'true',
-					publishedAt: updates.isPublished === 'true' ? new Date() : null,
-				}),
-				...(updates.wordCount && { wordCount: Number(updates.wordCount) }),
-			},
-		});
-		return json(200);
-	} catch (e) {
-		if (e instanceof Error) {
-			return json({ message: e.message ?? 'Something went wrong.' }, { status: 500 });
+				data: {
+					...(updates.title && { title: updates.title as string }),
+					...(updates.content && { content: updates.content as string }),
+					...(updates.subtitle && { subtitle: updates.subtitle as string }),
+					...(updates.isPublished && {
+						isPublished: updates.isPublished === 'true',
+						publishedAt: updates.isPublished === 'true' ? new Date() : null,
+					}),
+					...(updates.wordCount && { wordCount: Number(updates.wordCount) }),
+				},
+			});
+			return json(200);
+		} catch (e) {
+			if (e instanceof Error) {
+				return json({ message: e.message ?? 'Something went wrong.' }, { status: 500 });
+			}
 		}
 	}
 };
+
+export function useUpdateFetcher() {
+	return useFetcher({ key: 'update' });
+}
+
+export function useDeleteFetcher() {
+	return useFetcher({ key: 'delete' });
+}

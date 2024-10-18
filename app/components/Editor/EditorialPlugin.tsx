@@ -1,11 +1,15 @@
 import { useFetcher, useLoaderData } from '@remix-run/react';
 import { loader } from '~/routes/story_.$storyId';
+import EditIcon from '../../assets/edit-material-icon.svg?url'; // Adjust the path as necessary
 import InfoIcon from '../../assets/info-material-icon.svg?url'; // Adjust the path as necessary
 import VisibilityIcon from '../../assets/visibility-material-icon.svg?url'; // Adjust the path as necessary
+import PublishIcon from '../../assets/publish-material-icon.svg?url'; // Adjust the path as necessary
+import DeleteIcon from '../../assets/delete-material-icon.svg?url'; // Adjust the path as necessary
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useEffect, useState } from 'react';
 import SignedIn from '../SignedIn';
 import SignedOut from '../SignedOut';
+import { useDeleteFetcher, useUpdateFetcher } from '~/routes/api.story.$storyId.update';
 
 export default function EditorialPlugin() {
 	const loaderData = useLoaderData<typeof loader>();
@@ -17,7 +21,8 @@ export default function EditorialPlugin() {
 			: null;
 	const [editor] = useLexicalComposerContext();
 	const [editable, setEditable] = useState(false);
-	const fetcher = useFetcher();
+	const updateFetcher = useUpdateFetcher();
+	const deleteFetcher = useDeleteFetcher();
 	const readingTime = loaderData.story.wordCount / 200;
 
 	useEffect(() => {
@@ -81,7 +86,11 @@ export default function EditorialPlugin() {
 						className='h-4'
 					></img>
 					<span>
-						<strong>{loaderData.totalViews < 1 ? "No views so far." : `${loaderData.totalViews} views`}</strong>
+						<strong>
+							{loaderData.totalViews < 1
+								? 'No views so far.'
+								: `${loaderData.totalViews} views`}
+						</strong>
 						<SignedIn>&nbsp;(Your own views are not counted!)</SignedIn>
 					</span>
 				</span>
@@ -112,16 +121,32 @@ export default function EditorialPlugin() {
 										className='animate-pulse'
 									></circle>
 								</svg>
-								<span>You&apos;re editing this story</span>
+								<div className='flex flex-row gap-2 items-center justify-center'>
+									{editable ? null : (
+										<img
+											src={EditIcon}
+											alt='Edit'
+											className='h-4'
+										></img>
+									)}
+									<span>You&apos;re editing this story</span>
+								</div>
 							</div>
 						) : (
-							'Edit this story'
+							<div className='flex flex-row gap-2 items-center justify-center'>
+								<img
+									src={EditIcon}
+									alt='Edit'
+									className='h-4'
+								></img>
+								<span>Edit this story</span>
+							</div>
 						)}
 					</button>
 					<button
 						type='button'
 						title='publish'
-						className={`w-full md:w-56 px-4 py-2 transition-all justify-center ${
+						className={`w-full md:w-56 px-4 py-2 transition-all justify-center flex flex-row items-center gap-2 ${
 							loaderData.story.isPublished ? 'bg-orange-600' : 'bg-green-600'
 						} text-white rounded`}
 						onClick={() => {
@@ -132,18 +157,42 @@ export default function EditorialPlugin() {
 							}
 							const formData = new FormData();
 							formData.append('isPublished', String(!loaderData.story.isPublished));
-							fetcher.submit(formData, {
+							updateFetcher.submit(formData, {
 								method: 'POST',
 								action: `/api/story/${loaderData.story.id}/update`,
 							});
 						}}
 					>
-						{fetcher.state !== 'idle'
+						<img
+							src={PublishIcon}
+							alt='Publish'
+							className='h-4'
+						></img>
+						{updateFetcher.state !== 'idle'
 							? 'Working...'
 							: loaderData.story.isPublished
 							? 'Unpublish'
 							: 'Publish'}
 					</button>
+					<button
+						type='button'
+						title='publish'
+						className={`w-full md:w-56 px-4 py-2 transition-all justify-center bg-red-600 font-semibold text-white rounded flex flex-row gap-2 items-center`}
+						onClick={() => {
+							deleteFetcher.submit(null, {
+								action: `/api/story/${loaderData.story.id}/update`,
+								method: 'DELETE',
+							});
+						}}
+					>
+						<img
+							src={DeleteIcon}
+							alt='Delete'
+							className='h-4'
+						></img>
+						{deleteFetcher.state !== 'idle' ? 'Deleting...' : 'Delete this story'}
+					</button>
+
 					<hr className='mt-2' />
 					<a
 						href='/home'
@@ -153,7 +202,7 @@ export default function EditorialPlugin() {
 					</a>
 				</SignedIn>
 				<SignedOut>
-				<hr />
+					<hr />
 					<a
 						href={`/user/${loaderData.story.authors[0].user.username}`}
 						className='hover:underline'
