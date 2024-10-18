@@ -38,8 +38,8 @@ const theme: EditorThemeClasses = {
 	root: 'text-left',
 	ltr: 'text-left',
 	heading: {
-		h2: 'editor-heading-2',
 		h1: 'editor-heading-1',
+		h2: 'editor-heading-2',
 	},
 	quote: 'quote',
 	placeholder: 'placeholder',

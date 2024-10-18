@@ -31,6 +31,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 		const story = await prisma.story.findUniqueOrThrow({
 			where: {
 				id: Number(storyId),
+				isPublished: true,
 			},
 			include: {
 				authors: {

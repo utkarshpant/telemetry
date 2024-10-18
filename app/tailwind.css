@@ -28,7 +28,7 @@ html, body {
     }
 
     .editor-heading-1 {
-        @apply text-5xl md:text-7xl lg:text-8xl my-4 font-sans font-semibold tracking-tighter;
+        @apply text-5xl md:text-7xl lg:text-8xl my-4 font-sans font-semibold tracking-tighter leading-tight;
     }
 
     .placeholder {
