@@ -146,7 +146,7 @@ export default function ToolbarPlugin() {
 				ref={toolbarRef}
 			>
 				<span className='text-sm md:text-xs'>Formatting</span>
-				<hr className='dark:border-white border-black' />
+				<hr className='border-white' />
 				<div>
 					<button
 						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
