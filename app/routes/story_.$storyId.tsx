@@ -31,7 +31,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 		const story = await prisma.story.findUniqueOrThrow({
 			where: {
 				id: Number(storyId),
-				isPublished: true,
 			},
 			include: {
 				authors: {
@@ -50,6 +49,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 				},
 			},
 		});
+
+		if ((!session?.has('userId') || story.authors.some((author) => author.userId !== session.get('userId'))) && !story.isPublished) {
+			throw new Response("Sorry, we couldn't find that story.", { status: 404 });
+		}
 
 		const totalViews = await prisma.storyViews.aggregate({
 			where: {
