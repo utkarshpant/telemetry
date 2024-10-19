@@ -9,7 +9,12 @@ import {
 } from '@remix-run/react';
 import { type MetaFunction, type ActionFunctionArgs, LoaderFunction } from '@remix-run/node';
 import { prisma } from '../../prisma/db.server';
-import { comparePasswords, commitSession, getSession, validateRequestAndReturnSession } from '~/auth/utils.server';
+import {
+	comparePasswords,
+	commitSession,
+	getSession,
+	validateRequestAndReturnSession,
+} from '~/auth/utils.server';
 import { User } from '@prisma/client';
 import PasswordInput from '~/components/PasswordInput';
 
@@ -22,10 +27,10 @@ export const meta: MetaFunction = () => {
 
 export const loader: LoaderFunction = async ({ request }) => {
 	const session = await validateRequestAndReturnSession(request);
-    if (session) {
-        return redirect('/home');
-    }
-    return null;
+	if (session) {
+		return redirect('/home');
+	}
+	return null;
 };
 
 type ActionData =
@@ -61,7 +66,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 	const user = await prisma.user
 		.findFirst({
 			where: {
-				OR: [{ email: emailOrUsername.toLowerCase() }, { username: emailOrUsername.toLowerCase() }],
+				OR: [
+					{ email: emailOrUsername.toLowerCase() },
+					{ username: emailOrUsername.toLowerCase() },
+				],
 			},
 			include: {
 				credentials: true,
@@ -97,7 +105,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 						? request.headers.get('X-Forwarded-For')
 						: '127.0.0.1'
 				);
-                session.set('userId', user.id);
+				session.set('userId', user.id);
 				session.set('userAgent', request.headers.get('User-Agent'));
 				return redirect('/home', {
 					headers: {
@@ -136,66 +144,72 @@ export default function SignIn() {
 	}
 
 	return (
-		<authFetcher.Form
-			method='POST'
-			className='flex flex-col w-max rounded gap-2 p-2'
-			action='?index&intent=sign_in'
-		>
-			{/* Row 1 */}
-			<div className='w-full flex flex-row gap-2'>
-				<label
-					htmlFor='email_or_username'
-					className='w-full flex flex-col text-xs'
-				>
-					<span>
-						Email or Username<span className='text-red-600 font-semibold'>*</span>
-					</span>
-					<input
-						type='text'
-						name='email_or_username'
-						defaultValue={getDefaultEmail(searchParams, location)}
-						className='p-2 rounded text-base focus:bg-white focus:text-black'
-						aria-required='true'
-						required
-					></input>
-				</label>
-			</div>
-
-			{/* Row 2 */}
-			<div className='w-full flex flex-col gap-2'>
-				<label
-					htmlFor='password'
-					className='w-auto flex flex-col text-xs'
-				>
-					<span>
-						Password<span className='font-semibold text-red-600'>*</span>
-					</span>
-					<PasswordInput
-						name='password'
-						className='p-2 rounded text-base focus:bg-white focus:text-black'
-						aria-required='true'
-						required
-					></PasswordInput>
-				</label>
-				{actionData ? (
-					<p className='text-xs'>{actionData ? actionData.message : null}</p>
-				) : null}
-				<button
-					type='submit'
-					className='p-2 w-auto mt-2 bg-cyan-950 text-white rounded'
-				>
-					Sign in.
-				</button>
-				<span className='text-xs font-white mt-2'>
-					Not a member yet?{' '}
-					<a
-						href='/sign-up'
-						className='underline'
+		<div className='w-full h-full flex p-12'>
+			<authFetcher.Form
+				method='POST'
+				className='flex flex-col md:w-1/4 w-full m-auto rounded gap-2 text-lg md:text-base'
+				action='?index&intent=sign_in'
+			>
+				{/* Row 1 */}
+				<div className='max-w-full flex flex-row gap-2'>
+					<label
+						htmlFor='email_or_username'
+						className='flex flex-col w-full md:w-52'
 					>
-						Sign up.
-					</a>
-				</span>
-			</div>
-		</authFetcher.Form>
+						<span>
+							Email or Username<span className='text-red-600 font-semibold'>*</span>
+						</span>
+						<input
+							type='text'
+							name='email_or_username'
+							defaultValue={getDefaultEmail(searchParams, location)}
+							className='p-2 rounded bg-neutral-200 dark:bg-stone-300 dark:bg-opacity-35 text-black dark:text-white'
+							aria-required='true'
+							required
+						></input>
+					</label>
+				</div>
+
+				{/* Row 2 */}
+				<div className='w-full flex flex-col gap-2'>
+					<label
+						htmlFor='password'
+						className='flex flex-col w-full md:w-52'
+					>
+						<span>
+							Password<span className='font-semibold text-red-600'>*</span>
+						</span>
+						<PasswordInput
+							name='password'
+							containerClassName='flex flex-row bg-neutral-200 md:bg-transparent gap-2 md:p-0 rounded justify-between'
+							className='p-2 w-full bg-transparent rounded md:bg-neutral-200'
+							iconClassName='min-h-10 min-w-10 p-2 rounded bg-neutral-700'
+							aria-required='true'
+							required
+						></PasswordInput>
+					</label>
+					{actionData ? (
+						<span className='max-w-full break-words'>
+							{actionData ? actionData.message : null}
+						</span>
+					) : null}
+					<button
+						type='submit'
+						className='p-2 w-full md:w-52 mt-2 bg-cyan-950 text-white rounded'
+					>
+						Sign in.
+					</button>
+					<span className='font-white mt-2'>
+						Not a member yet?{' '}
+						<a
+							href='/sign-up'
+							className='underline'
+						>
+							Sign up.
+						</a>
+					</span>
+				</div>
+			</authFetcher.Form>
+		</div>
 	);
 }

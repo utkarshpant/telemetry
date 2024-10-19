@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import SignedIn from '../SignedIn';
 import SignedOut from '../SignedOut';
 import { useDeleteFetcher, useUpdateFetcher } from '~/routes/api.story.$storyId.update';
+import useUser from '~/hooks/useUser';
 
 export default function EditorialPlugin() {
 	const loaderData = useLoaderData<typeof loader>();
@@ -24,6 +25,7 @@ export default function EditorialPlugin() {
 	const updateFetcher = useUpdateFetcher();
 	const deleteFetcher = useDeleteFetcher();
 	const readingTime = loaderData.story.wordCount / 200;
+	const { user, signedIn } = useUser();
 
 	useEffect(() => {
 		return editor.registerEditableListener((editable) => {
@@ -31,16 +33,18 @@ export default function EditorialPlugin() {
 		});
 	});
 
+	const isUserAuthor = signedIn ? loaderData.story.authors.some((author) => author.userId === user?.id) : false;
+
 	return (
 		<div
 			className={
-				'animate-fade-in md:px-8 md:py-8 p-4 flex flex-col gap-4 md:pl-12 w-full min-h-full font-sans transition-all'
+				'animate-fade-in px-10 pb-12 md:pb-0 md:py-12 flex flex-col gap-4 w-full min-h-full font-sans md:text-sm text-xl transition-all'
 			}
 			// unused border classes: border-t border-t-black dark:border-t-white md:border-t-transparent md:border-l md:border-l-black md:dark:border-l-white md:dark:border-t-transparent
 		>
-			<div className='text-lg font-medium'>Editorial</div>
+			<div className='text-2xl md:text-lg font-medium'>Editorial</div>
 			<div className='flex flex-col gap-4'>
-				<span className='flex flex-row gap-2 items-center text-sm'>
+				<span className='flex flex-row gap-2 items-center'>
 					<img
 						src={InfoIcon}
 						alt='Info'
@@ -52,7 +56,7 @@ export default function EditorialPlugin() {
 					</span>
 				</span>
 				{loaderData.story.isPublished ? (
-					<span className='flex flex-row gap-2 items-center text-sm'>
+					<span className='flex flex-row gap-2 items-center'>
 						<img
 							src={InfoIcon}
 							alt='Info'
@@ -63,7 +67,7 @@ export default function EditorialPlugin() {
 						</span>
 					</span>
 				) : null}
-				<span className='flex flex-row gap-2 items-center text-sm'>
+				<span className='flex flex-row gap-2 items-center'>
 					<img
 						src={InfoIcon}
 						alt='Info'
@@ -79,7 +83,7 @@ export default function EditorialPlugin() {
 						&nbsp;({loaderData.story.wordCount} words).
 					</span>
 				</span>
-				<span className='flex flex-row gap-2 items-center text-sm'>
+				<span className='flex flex-row gap-2 items-center'>
 					<img
 						src={VisibilityIcon}
 						alt='Info'
@@ -95,105 +99,126 @@ export default function EditorialPlugin() {
 					</span>
 				</span>
 				<SignedIn>
-					<button
-						type='button'
-						className={`w-full md:w-56 px-4 py-2 rounded transition-colors ${
-							editor.isEditable() ? 'bg-neutral-800' : 'bg-sky-800'
-						} text-white`}
-						onClick={() => {
-							editor.update(() => {
-								editor.setEditable(!editor.isEditable());
-							});
-						}}
-					>
-						{editable ? (
-							<div className='flex flex-row items-baseline gap-2 justify-center'>
-								<svg
-									width='10'
-									height='10'
-									xmlns='http://www.w3.org/2000/svg'
-								>
-									<circle
-										cx='5'
-										cy='5'
-										r='5'
-										fill='#16a34a'
-										className='animate-pulse'
-									></circle>
-								</svg>
-								<div className='flex flex-row gap-2 items-center justify-center'>
-									{editable ? null : (
+					{isUserAuthor ? (
+						<>
+							<button
+								type='button'
+								className={`w-full md:w-56 px-4 py-2 rounded transition-colors ${
+									editor.isEditable()
+										? 'bg-neutral-800 hover:bg-neutral-700'
+										: 'bg-sky-800 hover:bg-sky-700'
+								} text-white`}
+								onClick={() => {
+									editor.update(() => {
+										editor.setEditable(!editor.isEditable());
+									});
+								}}
+							>
+								{editable ? (
+									<div className='flex flex-row items-baseline gap-2 justify-center'>
+										<svg
+											width='10'
+											height='10'
+											xmlns='http://www.w3.org/2000/svg'
+										>
+											<circle
+												cx='5'
+												cy='5'
+												r='5'
+												fill='#16a34a'
+												className='animate-pulse'
+											></circle>
+										</svg>
+										<div className='flex flex-row gap-2 items-center justify-center'>
+											{editable ? null : (
+												<img
+													src={EditIcon}
+													alt='Edit'
+													className='h-4'
+												></img>
+											)}
+											<span>You&apos;re editing this story</span>
+										</div>
+									</div>
+								) : (
+									<div className='flex flex-row gap-2 items-center justify-center'>
 										<img
 											src={EditIcon}
 											alt='Edit'
 											className='h-4'
 										></img>
-									)}
-									<span>You&apos;re editing this story</span>
-								</div>
-							</div>
-						) : (
-							<div className='flex flex-row gap-2 items-center justify-center'>
+										<span>Edit this story</span>
+									</div>
+								)}
+							</button>
+							<button
+								type='button'
+								title='publish'
+								className={`w-full md:w-56 px-4 py-2 transition-all justify-center flex flex-row items-center gap-2 ${
+									loaderData.story.isPublished
+										? 'bg-orange-600 hover:bg-orange-500'
+										: 'bg-green-600 hover:bg-green-500'
+								} text-white rounded`}
+								onClick={() => {
+									if (editable) {
+										editor.update(() => {
+											editor.setEditable(false);
+										});
+									}
+									const formData = new FormData();
+									formData.append(
+										'isPublished',
+										String(!loaderData.story.isPublished)
+									);
+									updateFetcher.submit(formData, {
+										method: 'POST',
+										action: `/api/story/${loaderData.story.id}/update`,
+									});
+								}}
+							>
 								<img
-									src={EditIcon}
-									alt='Edit'
+									src={PublishIcon}
+									alt='Publish'
 									className='h-4'
 								></img>
-								<span>Edit this story</span>
-							</div>
-						)}
-					</button>
-					<button
-						type='button'
-						title='publish'
-						className={`w-full md:w-56 px-4 py-2 transition-all justify-center flex flex-row items-center gap-2 ${
-							loaderData.story.isPublished ? 'bg-orange-600' : 'bg-green-600'
-						} text-white rounded`}
-						onClick={() => {
-							if (editable) {
-								editor.update(() => {
-									editor.setEditable(false);
-								});
-							}
-							const formData = new FormData();
-							formData.append('isPublished', String(!loaderData.story.isPublished));
-							updateFetcher.submit(formData, {
-								method: 'POST',
-								action: `/api/story/${loaderData.story.id}/update`,
-							});
-						}}
-					>
-						<img
-							src={PublishIcon}
-							alt='Publish'
-							className='h-4'
-						></img>
-						{updateFetcher.state !== 'idle'
-							? 'Working...'
-							: loaderData.story.isPublished
-							? 'Unpublish'
-							: 'Publish'}
-					</button>
-					<button
-						type='button'
-						title='publish'
-						className={`w-full md:w-56 px-4 py-2 transition-all justify-center bg-red-600 font-semibold text-white rounded flex flex-row gap-2 items-center`}
-						onClick={() => {
-							deleteFetcher.submit(null, {
-								action: `/api/story/${loaderData.story.id}/update`,
-								method: 'DELETE',
-							});
-						}}
-					>
-						<img
-							src={DeleteIcon}
-							alt='Delete'
-							className='h-4'
-						></img>
-						{deleteFetcher.state !== 'idle' ? 'Deleting...' : 'Delete this story'}
-					</button>
+								{updateFetcher.state !== 'idle'
+									? 'Working...'
+									: loaderData.story.isPublished
+									? 'Unpublish'
+									: 'Publish'}
+							</button>
+							<button
+								type='button'
+								title='publish'
+								className={`w-full md:w-56 px-4 py-2 transition-all justify-center bg-red-600 hover:bg-red-700 font-semibold text-white rounded flex flex-row gap-2 items-center`}
+								onClick={() => {
+									deleteFetcher.submit(null, {
+										action: `/api/story/${loaderData.story.id}/update`,
+										method: 'DELETE',
+									});
+								}}
+							>
+								<img
+									src={DeleteIcon}
+									alt='Delete'
+									className='h-4'
+								></img>
+								{deleteFetcher.state !== 'idle'
+									? 'Deleting...'
+									: 'Delete this story'}
+							</button>
+						</>
+					) : null}
 
 					<hr className='mt-2' />
+					{!isUserAuthor ? (
+						<a
+							href={`/user/${loaderData.story.authors[0].user.username}`}
+							className='hover:underline'
+						>
+							More stories by {loaderData.story.authors[0].user.firstName}...
+						</a>
+					) : null}
 					<a
 						href='/home'
 						className='hover:underline'

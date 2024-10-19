@@ -23,6 +23,7 @@ import { useDebounceFetcher } from 'remix-utils/use-debounce-fetcher';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import EditorialPlugin from './EditorialPlugin';
 import { StoryLoaderData } from '~/routes/story_.$storyId';
+import Header from '../Header/Header';
 
 const theme: EditorThemeClasses = {
 	// Define your theme here
@@ -82,7 +83,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 	return (
 		<ClientOnly
 			fallback={
-				<div className='w-full h-full flex items-center justify-center animate-fade-in'>
+				<div className='w-full h-screen flex items-center justify-center animate-fade-in'>
 					Loading...
 				</div>
 			}
@@ -104,11 +105,12 @@ export default function Editor({ children }: { children?: ReactNode }) {
 					<div
 						className='flex flex-col min-h-full w-full p-2'
 					>
+						{/* <Header /> */}
 						{storyData.allowEdits ? <ToolbarPlugin /> : null}
 						<RichTextPlugin
 							contentEditable={
 								<ContentEditable
-									className={`animate-fade-in px-8 lg:p-0 py-4 w-full md:mx-auto h-full border-none focus:outline-none text-2xl md:text-xl font-serif text-left`}
+									className={`animate-fade-in px-8 lg:p-0 py-4 w-full lg:w-10/12 md:mx-auto h-full border-none focus:outline-none text-2xl md:text-xl font-serif text-left`}
 								/>
 							}
 							placeholder={

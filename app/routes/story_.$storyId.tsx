@@ -99,7 +99,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 export default function Story() {
 	return (
 		<div
-			className={`w-full min-h-screen flex flex-col md:flex-row gap-4 md:py-12 md:px-12 relative justify-between`}
+			className={`w-full min-h-screen flex flex-col md:flex-row gap-4 md:p-12 relative justify-between`}
 		>
 			<LexicalEditor></LexicalEditor>
 		</div>
