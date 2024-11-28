@@ -2,6 +2,7 @@ import { type ActionFunction } from '@remix-run/node';
 import { redirect } from '@remix-run/node';
 import { json, useFetcher } from '@remix-run/react';
 import { validateRequestAndReturnSession, destroySession } from '~/auth/utils.server';
+import LogoutIcon from '../assets/logout-material-icon.svg?url';
 
 export const action: ActionFunction = async ({ request }) => {
 	const session = await validateRequestAndReturnSession(request);
@@ -26,8 +27,7 @@ export function SignOut() {
 	const signOutFetcher = useFetcher({ key: 'sign-out' });
 	return (
 		<button
-			type='button'
-			className='bg-transparent dark:text-white text-neutral-950 px-4 py-1 text-base'
+			className='w-full md:w-52 bg-sky-900 hover:bg-sky-800 py-2 px-4 rounded text-white items-center justify-center flex flex-row gap-2'
 			onClick={() => {
 				signOutFetcher.submit(null, {
 					method: 'post',
@@ -35,6 +35,11 @@ export function SignOut() {
 				});
 			}}
 		>
+			<img
+				src={LogoutIcon}
+				className='h-4'
+				alt='Logout icon'
+			/>{' '}
 			{signOutFetcher.state === 'submitting' ? 'Signing you out...' : 'Sign out'}
 		</button>
 	);

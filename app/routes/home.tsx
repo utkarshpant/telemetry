@@ -3,8 +3,8 @@ import { redirect, useFetcher } from '@remix-run/react';
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { getGreetingByTimeOfDay } from 'utils/utils';
 import useUser from '~/hooks/useUser';
-import { useRef, useState } from 'react';
-import LogoutIcon from '../assets/logout-material-icon.svg?url';
+import { useState } from 'react';
+import { SignOut } from './_auth.sign-out';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const session = await validateRequestAndReturnSession(request);
@@ -19,7 +19,7 @@ export function NewStoryButton() {
 	const fetcher = useFetcher();
 	return (
 		<button
-			className='px-4 py-1 bg-sky-900 rounded w-56 text-base'
+			className='px-4 py-2 rounded w-52 text-base bg-green-600 hover:bg-green-500 text-white'
 			onClick={() => {
 				fetcher.submit(null, {
 					method: 'POST',
@@ -34,10 +34,9 @@ export function NewStoryButton() {
 
 export default function Home() {
 	const { user } = useUser();
-	const [hasPreview, setHasPreview] = useState(false);
-	const inputRef = useRef<HTMLInputElement>(null);
 	const fetcher = useFetcher();
-	const [textAreaLength, setTextAreaLength] = useState(0);
+	const [textAreaLength, setTextAreaLength] = useState(user?.bio?.length ?? 0);
+
 	return (
 		<div className='w-full h-screen flex flex-col justify-between md:flex-row p-12 gap-2 items-start text-xl md:text-base'>
 			<div className='w-full md:min-w-10/12 mx-auto flex flex-col gap-4 p-0 md:p-8'>
@@ -117,29 +116,26 @@ export default function Home() {
 							className='p-2 rounded bg-neutral-200 dark:bg-stone-700 resize-none h-48 text-black dark:text-white placeholder:text-neutral-400'
 							maxLength={250}
 							name='bio'
-							defaultValue={user?.bio}
+							defaultValue={user?.bio as string}
 							placeholder='Tell us a little about yourself.'
 							onChange={(event) => {
 								setTextAreaLength(event.target.value.length);
 							}}
 						></textarea>
 					</label>
-					<button className='w-full md:w-52 bg-amber-600 text-white p-2 rounded' onClick={() => {
-
-					}}>Update profile</button>
+					<button
+						className='w-full md:w-52 bg-amber-600 text-white p-2 rounded'
+						onClick={() => {}}
+					>
+						Update profile
+					</button>
 				</fetcher.Form>
 				<div></div>
 			</div>
 			<div className='w-full md:w-1/3 flex flex-col gap-4 p-0 md:p-8 pb-12'>
 				<h1 className='font-semibold'>Account</h1>
-				<button className='w-full md:w-52 bg-sky-900 py-2 px-4 rounded text-white items-center justify-center flex flex-row gap-2' type='submit'>
-					<img
-						src={LogoutIcon}
-						className='h-4'
-						alt='Logout icon'
-					/>{' '}
-					Sign out
-				</button>
+				<SignOut />
+				<NewStoryButton />
 			</div>
 		</div>
 	);

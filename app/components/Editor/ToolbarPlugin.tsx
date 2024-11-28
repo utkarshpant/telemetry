@@ -3,7 +3,6 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $findMatchingParent, mergeRegister } from '@lexical/utils';
 import {
 	$createParagraphNode,
-	$createRangeSelection,
 	$createTextNode,
 	$getSelection,
 	$isRangeSelection,

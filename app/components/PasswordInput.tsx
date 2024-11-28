@@ -1,41 +1,30 @@
-import { type InputHTMLAttributes, useState, useEffect, useRef } from 'react';
+import { type InputHTMLAttributes, useState, useRef } from 'react';
 import VisibilitySvg from '../assets/visibility-material-icon.svg';
 import { forwardRef } from 'react';
 
 interface PasswordInputProps extends InputHTMLAttributes<HTMLInputElement> {}
 
-const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps & { containerClassName: string; iconClassName: string; }>(
-    ({ name, containerClassName, className, iconClassName, ...props }, ref) => {
+const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
+    ({ name, ...props }, ref) => {
         const parentRef = ref;
         const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-        const [isSmallScreen, setIsSmallScreen] = useState(false);
         const divRef = useRef<HTMLDivElement>(null);
-
-        useEffect(() => {
-            const handleResize = () => {
-                setIsSmallScreen(window.innerWidth <= 640); // Adjust the breakpoint as needed
-            };
-
-            handleResize(); // Check initial screen size
-            window.addEventListener('resize', handleResize);
-            return () => window.removeEventListener('resize', handleResize);
-        }, []);
 
         return (
             <div
                 ref={divRef}
-                className={containerClassName}
+                className="flex flex-row gap-2 justify-between"
             >
                 <input
                     type={isPasswordVisible ? 'text' : 'password'}
                     name={name ?? 'password'}
                     ref={parentRef}
-                    className={className}
+                    className="p-2 rounded bg-neutral-200 dark:bg-stone-300 dark:bg-opacity-35 text-black dark:text-white w-4/5"
                     {...props}
                 />
                 <button
                     type='button'
-                    className={iconClassName}
+                    className="min-h-10 min-w-10 p-2 rounded bg-stone-500"
                     onClick={() => {
                         setIsPasswordVisible(!isPasswordVisible);
                     }}

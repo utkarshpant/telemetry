@@ -1,6 +1,6 @@
-import { ActionFunctionArgs, json } from '@remix-run/node';
+import { ActionFunctionArgs, json, redirect } from '@remix-run/node';
 import { prisma } from 'prisma/db.server';
-import { validateRequestAndReturnSession } from '~/auth/utils.server';
+import { commitSession, validateRequestAndReturnSession } from '~/auth/utils.server';
 
 export async function action({ request, params }: ActionFunctionArgs) {
 	const session = await validateRequestAndReturnSession(request);
@@ -22,7 +22,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
 					...(updates.bio && { bio: updates.bio as string }),
 				},
 			});
-			return json(200);
+			return redirect('/home', {
+				headers: {
+					'Set-Cookie': await commitSession(session),
+				}
+			});
 		} catch (e) {
 			if (e instanceof Error) {
 				return json({ message: e.message ?? 'Something went wrong.' }, { status: 500 });

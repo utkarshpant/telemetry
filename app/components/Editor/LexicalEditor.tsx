@@ -23,7 +23,7 @@ import { useDebounceFetcher } from 'remix-utils/use-debounce-fetcher';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import EditorialPlugin from './EditorialPlugin';
 import { StoryLoaderData } from '~/routes/story_.$storyId';
-import Header from '../Header/Header';
+// import Header from '../Header/Header';
 
 const theme: EditorThemeClasses = {
 	// Define your theme here

@@ -4,7 +4,8 @@ import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
 import stylesheet from './tailwind.css?url';
 import { validateRequestAndReturnSession } from './auth/utils.server';
 import { User } from '@prisma/client';
-import Header from './components/Header/Header';
+
+// import Header from './components/Header/Header';
 
 export const links: LinksFunction = () => [
 	{ rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -25,6 +26,10 @@ export const links: LinksFunction = () => [
 		rel: 'stylesheet',
 		href: stylesheet,
 	},
+	{
+		rel: 'icon',
+		href: '/favicon.png',
+	}
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

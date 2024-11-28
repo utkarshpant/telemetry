@@ -181,9 +181,6 @@ export default function SignIn() {
 						</span>
 						<PasswordInput
 							name='password'
-							containerClassName='flex flex-row bg-neutral-200 md:bg-transparent gap-2 md:p-0 rounded justify-between'
-							className='p-2 w-full bg-transparent rounded md:bg-neutral-200'
-							iconClassName='min-h-10 min-w-10 p-2 rounded bg-neutral-700'
 							aria-required='true'
 							required
 						></PasswordInput>
