@@ -62,12 +62,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 				count: true,
 			},
 		});
-		console.log('total views', totalViews);
 		if (
 			!session?.has('userId') ||
 			story.authors.some((author) => author.userId !== session.get('userId'))
 		) {
-			console.log('incrementing views');
 			prisma.storyViews
 				.upsert({
 					where: {
