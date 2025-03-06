@@ -23,7 +23,7 @@ export type RandomStoryPreview = {
 	};
 };
 
-export async function getSampledStoriesWithAuthors(n: number) {
+async function getSampledStoriesWithAuthors(n: number) {
 	const sampledStories: Array<
 		Pick<Story, 'id' | 'title' | 'subtitle' | 'publishedAt'> & {
 			authors: Array<
