@@ -213,7 +213,7 @@ export default function EditorialPlugin() {
 					<hr className='mt-2' />
 					{!isUserAuthor ? (
 						<a
-							href={`/user/${loaderData.story.authors[0].user.username}`}
+							href={`/${loaderData.story.authors[0].user.username}`}
 							className='hover:underline'
 						>
 							More stories by {loaderData.story.authors[0].user.firstName}...
@@ -229,7 +229,7 @@ export default function EditorialPlugin() {
 				<SignedOut>
 					<hr />
 					<a
-						href={`/user/${loaderData.story.authors[0].user.username}`}
+						href={`/${loaderData.story.authors[0].user.username}`}
 						className='hover:underline'
 					>
 						More stories by {loaderData.story.authors[0].user.firstName}...

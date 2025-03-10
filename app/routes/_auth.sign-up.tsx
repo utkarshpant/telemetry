@@ -108,161 +108,161 @@ export default function SignUp() {
 	const [searchParams] = useSearchParams();
 
 	return (
-		<authFetcher.Form
-			method='POST'
-			className='flex flex-col w-max rounded gap-2 p-2'
-			action='?index&intent=sign_up'
-		>
-			{/* Row 1 */}
-			<div className='w-full flex flex-row gap-2'>
-				<label
-					htmlFor='first_name'
-					className='w-auto flex flex-col text-xs'
-				>
-					<span>
-						First Name<span className='text-red-600 font-semibold'>*</span>
-					</span>
-					<input
-						type='text'
-						name='first_name'
-						defaultValue={searchParams.get('first_name') ?? ''}
-						className='p-2 rounded text-base focus:bg-white focus:text-black'
-						required
-						aria-required='true'
-					></input>
-				</label>
-				<label
-					htmlFor='last_name'
-					className='w-auto flex flex-col text-xs'
-				>
-					Last Name
-					<input
-						type='text'
-						name='last_name'
-						defaultValue={searchParams.get('last_name') ?? ''}
-						className='p-2 rounded text-base focus:bg-white focus:text-black'
-					></input>
-				</label>
-			</div>
-			{/* Row 2 */}
-			<div className='w-full flex flex-row gap-2'>
-				<label
-					htmlFor='username'
-					className='w-auto flex flex-col text-xs'
-				>
-					<span>
-						Username<span className='text-red-600 font-semibold'>*</span>
-					</span>
-					<input
-						type='text'
-						name='username'
-						ref={usernameRef}
-						defaultValue={searchParams.get('username') ?? ''}
-						className='p-2 rounded text-base focus:bg-white focus:text-black'
-						aria-required='true'
-						// onChange={() => {
-						// 	setSearchParams({
-						// 		...searchParams,
-						// 		...(usernameRef.current?.value
-						// 			? { username: usernameRef.current && usernameRef.current.value }
-						// 			: null),
-						// 	});
-						// }}
-						required
-					></input>
-				</label>
-				<label
-					htmlFor='email'
-					className='w-auto flex flex-col text-xs'
-				>
-					<span>
-						Email<span className='text-red-600 font-semibold'>*</span>
-					</span>
-					<input
-						type='email'
-						name='email'
-						defaultValue={searchParams.get('email') ?? ''}
-						// onChange={() => {
-						// 	setSearchParams({
-						// 		...searchParams,
-						// 		...(emailRef.current?.value
-						// 			? { email: emailRef.current && emailRef.current.value }
-						// 			: null),
-						// 	});
-						// }}
-						ref={emailRef}
-						className='p-2 rounded text-base focus:bg-white focus:text-black'
-					></input>
-				</label>
-			</div>
-			{/* Row 3
+		<div className='w-full h-full flex p-12'>
+			<authFetcher.Form
+				method='POST'
+				className='flex flex-col m-auto rounded gap-2 text-lg md:text-base'
+				action='?index&intent=sign_up'
+			>
+				{/* Row 1 */}
+				<div className='flex flex-col w-full gap-2'>
+					<label
+						htmlFor='first_name'
+						className='flex flex-col w-full'
+					>
+						<span>
+							First Name<span className='text-red-600 font-semibold'>*</span>
+						</span>
+						<input
+							type='text'
+							name='first_name'
+							defaultValue={searchParams.get('first_name') ?? ''}
+							className='p-2 rounded bg-neutral-200 dark:bg-stone-300 dark:bg-opacity-35 text-black dark:text-white'
+							required
+							aria-required='true'
+						></input>
+					</label>
+					<label
+						htmlFor='last_name'
+						className='flex flex-col w-full'
+					>
+						Last Name
+						<input
+							type='text'
+							name='last_name'
+							defaultValue={searchParams.get('last_name') ?? ''}
+							className='p-2 rounded bg-neutral-200 dark:bg-stone-300 dark:bg-opacity-35 text-black dark:text-white'
+						></input>
+					</label>
+				</div>
+				{/* Row 2 */}
+				<div className='w-full flex flex-col gap-2'>
+					<label
+						htmlFor='username'
+						className='flex flex-col w-full'
+					>
+						<span>
+							Username<span className='text-red-600 font-semibold'>*</span>
+						</span>
+						<input
+							type='text'
+							name='username'
+							ref={usernameRef}
+							defaultValue={searchParams.get('username') ?? ''}
+							className='p-2 rounded bg-neutral-200 dark:bg-stone-300 dark:bg-opacity-35 text-black dark:text-white'
+							aria-required='true'
+							// onChange={() => {
+							// 	setSearchParams({
+							// 		...searchParams,
+							// 		...(usernameRef.current?.value
+							// 			? { username: usernameRef.current && usernameRef.current.value }
+							// 			: null),
+							// 	});
+							// }}
+							required
+						></input>
+					</label>
+					<label
+						htmlFor='email'
+						className='flex flex-col w-full'
+					>
+						<span>
+							Email<span className='text-red-600 font-semibold'>*</span>
+						</span>
+						<input
+							type='email'
+							name='email'
+							defaultValue={searchParams.get('email') ?? ''}
+							// onChange={() => {
+							// 	setSearchParams({
+							// 		...searchParams,
+							// 		...(emailRef.current?.value
+							// 			? { email: emailRef.current && emailRef.current.value }
+							// 			: null),
+							// 	});
+							// }}
+							ref={emailRef}
+							className='p-2 rounded bg-neutral-200 dark:bg-stone-300 dark:bg-opacity-35 text-black dark:text-white'
+						></input>
+					</label>
+				</div>
+				{/* Row 3
 			<div className='w-full'>
 			</div> */}
-			{/* Row 4 */}
-			<div className='w-full flex flex-col gap-2'>
-				<label
-					htmlFor='password'
-					className='w-full flex flex-col text-xs'
-				>
-					<span>
-						Password<span className='font-semibold text-red-600'>*</span>
-					</span>
-					<PasswordInput
-						ref={passwordRef}
-						name='password'
-						className='p-2 rounded w-full text-base focus:bg-white focus:text-black'
-						aria-required='true'
-						onChange={matchPasswords}
-						required
-					></PasswordInput>
-				</label>
-				<label
-					htmlFor='re-enter-password'
-					className='w-full flex flex-col text-xs'
-				>
-					<span>
-						Re-enter Password
-						<span className='font-semibold text-red-600'>*</span>
-					</span>
-					<PasswordInput
-						ref={confirmPasswordRef}
-						name='re-enter-password'
-						className='p-2 w-full text-base focus:bg-white focus:text-black'
-						aria-required='true'
-						onChange={matchPasswords}
-						required
-					></PasswordInput>
-					{validationMessage ? (
-						<p className='mt-2 text-xs'>{validationMessage}</p>
-					) : null}
-				</label>
-			</div>
-			{/* Row 5 */}
-			<div className='w-full flex flex-col'>
-				{actionData ? <p className='text-xs'>{actionData.message}</p> : null}
-				<button
-					type='submit'
-					className='p-2 bg-cyan-950 w-full mt-4 text-white rounded'
-				>
-					Sign up.
-				</button>
-				<span className='text-xs font-white mt-2'>
-					Already a member?{' '}
-					<Link
-						to={{
-							pathname: '/sign-in',
-							search: searchParams.toString(),
-						}}
-						state={{
-							email: emailRef.current?.value,
-							username: usernameRef.current?.value,
-						}}
-						className='underline'
+				{/* Row 4 */}
+				<div className='w-full flex flex-col gap-2'>
+					<label
+						htmlFor='password'
+						className='w-full flex flex-col'
 					>
-						Sign in.
-					</Link>
-				</span>
-			</div>
-		</authFetcher.Form>
+						<span>
+							Password<span className='font-semibold text-red-600'>*</span>
+						</span>
+						<PasswordInput
+							ref={passwordRef}
+							name='password'
+							aria-required='true'
+							onChange={matchPasswords}
+							required
+						></PasswordInput>
+					</label>
+					<label
+						htmlFor='re-enter-password'
+						className='w-full flex flex-col'
+					>
+						<span>
+							Re-enter Password
+							<span className='font-semibold text-red-600'>*</span>
+						</span>
+						<PasswordInput
+							ref={confirmPasswordRef}
+							name='re-enter-password'
+							aria-required='true'
+							onChange={matchPasswords}
+							required
+						></PasswordInput>
+						{validationMessage ? (
+							<p className='mt-2 text-xs'>{validationMessage}</p>
+						) : null}
+					</label>
+				</div>
+				{/* Row 5 */}
+				<div className='w-full flex flex-col'>
+					{actionData ? <p className='text-xs'>{actionData.message}</p> : null}
+					<button
+						type='submit'
+						className='p-2 bg-cyan-950 w-full mt-2 text-white rounded'
+					>
+						Sign up.
+					</button>
+					<span className='font-white mt-2'>
+						Already a member?{' '}
+						<Link
+							to={{
+								pathname: '/sign-in',
+								search: searchParams.toString(),
+							}}
+							state={{
+								email: emailRef.current?.value,
+								username: usernameRef.current?.value,
+							}}
+							className='underline'
+						>
+							Sign in.
+						</Link>
+					</span>
+				</div>
+			</authFetcher.Form>
+		</div>
 	);
 }

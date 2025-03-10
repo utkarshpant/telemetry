@@ -37,3 +37,9 @@ export function getGreetingByTimeOfDay() {
 		return 'Good evening';
 	}
 }
+
+export function getReadingTime(wordCount: number) {
+	const wordsPerMinute = 250;
+	const minutes = Math.ceil(wordCount / wordsPerMinute);
+	return minutes;
+}

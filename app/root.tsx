@@ -1,8 +1,8 @@
-import { json, Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import { json, Links, Meta, Outlet, redirect, Scripts, ScrollRestoration } from '@remix-run/react';
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
 
 import stylesheet from './tailwind.css?url';
-import { validateRequestAndReturnSession } from './auth/utils.server';
+import { destroySession, validateRequestAndReturnSession } from './auth/utils.server';
 import { User } from '@prisma/client';
 
 // import Header from './components/Header/Header';
@@ -29,11 +29,22 @@ export const links: LinksFunction = () => [
 	{
 		rel: 'icon',
 		href: '/favicon.png',
-	}
+	},
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const session = await validateRequestAndReturnSession(request);
+	if (session) {
+		if (
+			session.get('status') !== 'ACTIVE' ||
+			(session.get('expiresAt') && new Date(session.get('expiresAt').toDateString())) <
+				new Date()
+		) {
+			return redirect('/sign-in', {
+				headers: { 'Set-Cookie': await destroySession(session) },
+			});
+		}
+	}
 	return json({
 		user: session?.has('user') ? (session.get('user') as User) : null,
 		signedIn: session ? true : false,

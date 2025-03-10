@@ -147,14 +147,14 @@ export default function SignIn() {
 		<div className='w-full h-full flex p-12'>
 			<authFetcher.Form
 				method='POST'
-				className='flex flex-col md:w-1/4 w-full m-auto rounded gap-2 text-lg md:text-base'
+				className='flex flex-col m-auto rounded gap-2 text-lg md:text-base'
 				action='?index&intent=sign_in'
 			>
 				{/* Row 1 */}
 				<div className='max-w-full flex flex-row gap-2'>
 					<label
 						htmlFor='email_or_username'
-						className='flex flex-col w-full md:w-52'
+						className='flex flex-col w-full'
 					>
 						<span>
 							Email or Username<span className='text-red-600 font-semibold'>*</span>
@@ -174,7 +174,7 @@ export default function SignIn() {
 				<div className='w-full flex flex-col gap-2'>
 					<label
 						htmlFor='password'
-						className='flex flex-col w-full md:w-52'
+						className='flex flex-col w-full'
 					>
 						<span>
 							Password<span className='font-semibold text-red-600'>*</span>
@@ -192,11 +192,11 @@ export default function SignIn() {
 					) : null}
 					<button
 						type='submit'
-						className='p-2 w-full md:w-52 mt-2 bg-cyan-950 text-white rounded'
+						className='p-2 w-full mt-2 bg-cyan-950 text-white rounded'
 					>
 						Sign in.
 					</button>
-					<span className='font-white mt-2'>
+					<span className='font-white'>
 						Not a member yet?{' '}
 						<a
 							href='/sign-up'

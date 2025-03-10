@@ -28,7 +28,7 @@ export async function comparePasswords(
 const prisma = new PrismaClient();
 
 export const { getSession, commitSession, destroySession } = createSessionStorage<
-	Pick<Session, 'ipAddress' | 'userId' | 'userAgent'> & { user: User }
+	Pick<Session, 'userId' | 'id' | 'status' | 'expiresAt'> & { user: User }
 >({
 	cookie: {
 		name: '__session',
@@ -42,8 +42,7 @@ export const { getSession, commitSession, destroySession } = createSessionStorag
 			data: {
 				userId: data.userId as number,
 				expiresAt: expires,
-				ipAddress: data.ipAddress,
-				userAgent: data.userAgent,
+				status: data.status,
 			},
 		});
 		return session.id;
@@ -51,7 +50,7 @@ export const { getSession, commitSession, destroySession } = createSessionStorag
 	async readData(id) {
 		const session = await prisma.session.findFirst({
 			where: {
-				AND: [{ id }, { status: 'ACTIVE' }, { expiresAt: { gte: new Date() } }],
+				id,
 			},
 			include: {
 				user: true,
@@ -62,6 +61,7 @@ export const { getSession, commitSession, destroySession } = createSessionStorag
 			userId: session.userId,
 			sessionId: session.id,
 			user: session.user,
+			status: session.status,
 		};
 	},
 	async updateData(id, data, expires) {
