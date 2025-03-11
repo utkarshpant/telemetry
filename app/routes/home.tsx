@@ -37,8 +37,8 @@ function getNavTabClasses(active: boolean) {
 }
 
 const textAreaStateMap = {
-	noError: ['oklch(0.145 0 0)', 'oklch(0.496 0.265 301.924)', 'oklch(0.789 0.154 211.53)'], // all good!
-	hasError: ['oklch(0.145 0 0)', 'oklch(0.645 0.246 16.439)', 'oklch(0.789 0.154 211.53)'],
+	noError: ['oklch(0.145 0 0)', 'oklch(0.704 0.14 182.503)', 'oklch(0.398 0.07 227.392)'], // all good!
+	hasError: ['oklch(0.455 0.188 13.697)', 'oklch(0.555 0.163 48.998)', 'oklch(0.396 0.141 25.723)'],
 };
 
 export default function Home() {
@@ -52,14 +52,14 @@ export default function Home() {
 	const wrapperRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (wrapperRef.current) {
+		if (wrapperRef.current && bioEditable) {
 			const [a, b, c] =
 				textAreaLength > 250 ? textAreaStateMap.hasError : textAreaStateMap.noError;
 			wrapperRef.current.style.setProperty('--color-a', a);
 			wrapperRef.current.style.setProperty('--color-b', b);
 			wrapperRef.current.style.setProperty('--color-c', c);
 		}
-	});
+	}, [bioEditable, textAreaLength]);
 
 	if (signedIn)
 		return (
@@ -81,7 +81,7 @@ export default function Home() {
 						</label>
 						<div
 							ref={wrapperRef}
-							className='relative bg-gradient-to-br from-[--color-a] via-[--color-b] to-[--color-c] [transition-property:_--color-a,_--color-b,_--color-c] ease-in duration-500 h-max md:rounded px-6 py-4 -mx-6 md:-ml-6 md:-mx-0 md:px-6 text-white backdrop-blur-lg before:absolute before:left-[20%] before:top-[10%] before:w-[70%] before:h-[20%] before:origin-[20%] before:bg-stone-800 before:rounded-3xl before:blur-[50px] before:brightness-125 before:bg-gradient-to-br before:from-[--color-a] before:to-[--color-c] before:animate-blob before:-z-10 focus:ring-0 focus:outline-none outline-none'
+							className='relative bg-gradient-to-br from-[--color-a] to-[--color-b] via-[--color-c] [transition-property:_--color-a,_--color-b,_--color-c] ease-out duration-500 h-max md:rounded px-6 py-4 -mx-6 md:-ml-6 md:-mx-0 md:px-6 text-white backdrop-blur-2xl before:absolute before:left-[25%] before:top-[20%] before:w-[50%] before:h-[40%] before:bg-stone-800 before:rounded-full before:blur-[30px] before:brightness-125 before:bg-gradient-to-r before:from-[--color-a] before:to-[--color-b] before:animate-blob before:-z-10 focus:ring-0 focus:outline-none outline-none before:bg-opacity-15'
 						>
 							<div
 								contentEditable={bioEditable}
