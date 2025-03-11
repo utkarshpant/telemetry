@@ -53,7 +53,7 @@ export default function Index() {
 					</Link>
 				))}
 			</p>
-			<p className='z-10 animate-fade-in'>Telemetry is a place to blog without distractions, and with your whole personality.</p>
+			<p className='z-10 animate-fade-in p-6 text-center'>Telemetry is a place to blog without distractions, and with your whole personality.</p>
 			<a
 				href='/sign-in'
 				className='z-10 underline animate-fade-in'
