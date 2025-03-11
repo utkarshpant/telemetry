@@ -110,7 +110,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 						<RichTextPlugin
 							contentEditable={
 								<ContentEditable
-									className={`animate-fade-in px-8 lg:p-0 py-4 w-full lg:w-10/12 md:mx-auto h-full border-none focus:outline-none text-2xl md:text-xl font-serif text-left`}
+									className={`animate-fade-in px-8 lg:p-0 py-4 w-full lg:w-10/12 md:mx-auto h-full border-none focus:outline-none text-xl md:text-base font-serif text-left`}
 								/>
 							}
 							placeholder={

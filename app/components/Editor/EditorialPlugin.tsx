@@ -38,11 +38,11 @@ export default function EditorialPlugin() {
 	return (
 		<div
 			className={
-				'animate-fade-in px-10 pb-12 md:pb-0 md:py-12 flex flex-col gap-4 w-full min-h-full font-sans md:text-sm text-xl transition-all'
+				'animate-fade-in px-10 pb-12 md:pb-0 md:py-12 flex flex-col gap-4 w-full min-h-full font-sans md:text-sm text-base transition-all'
 			}
 			// unused border classes: border-t border-t-black dark:border-t-white md:border-t-transparent md:border-l md:border-l-black md:dark:border-l-white md:dark:border-t-transparent
 		>
-			<div className='text-2xl md:text-lg font-medium'>Editorial</div>
+			<div className='text-xl md:text-base font-medium'>Editorial</div>
 			<div className='flex flex-col gap-4'>
 				<span className='flex flex-row gap-2 items-center'>
 					<img

@@ -42,11 +42,11 @@ html, body {
     }
 
     .editor-heading-2 {
-        @apply text-4xl md:text-3xl font-sans font-semibold tracking-tighter;
+        @apply text-2xl md:text-2xl font-sans font-semibold tracking-tighter;
     }
 
     .editor-heading-1 {
-        @apply text-5xl md:text-6xl lg:text-8xl my-4 font-sans font-semibold tracking-tighter leading-tight;
+        @apply text-5xl my-4 font-sans font-semibold tracking-tight leading-tight;
     }
 
     .placeholder {

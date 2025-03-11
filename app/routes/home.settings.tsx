@@ -125,13 +125,13 @@ export default function Settings() {
 
 	if (signedIn)
 		return (
-			<div className='flex flex-col gap-2 text-xl'>
+			<div className='flex flex-col gap-2 text-base'>
 				<p>
 					Hi, {user.firstName}! This is where you can control every part of your Telemetry
 					experience. Update your email or username, change your profile photo, keep track
 					of sessions, and if needed, request deletion of your account.
 				</p>
-				<h1>Sessions</h1>
+				<h1 className='text-xl'>Sessions (6 most recent)</h1>
 				<div className='flex flex-col my-2 h-full w-full text-xl'>
 					<SessionCard session={currentSession} fetcher={sessionFetcher} />
                     {sessions.map((session) => (

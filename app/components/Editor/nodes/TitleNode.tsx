@@ -40,7 +40,7 @@ export class TitleNode extends ElementNode {
 
 	exportDOM(editor: LexicalEditor): DOMExportOutput {
 		const title = document.createElement('h1');
-		title.classList.add('text-4xl');
+		title.classList.add('text-2xl');
 		return { element: title };
 	}
 

@@ -38,7 +38,7 @@ function StoryCard({ story }: StoryCardProps) {
 			key={story.id}
 			className='flex flex-col gap-1 overflow-scroll no-scrollbar'
 		>
-			<span className='text-2xl tracking-tight flex flex-row flex-wrap gap-1'>
+			<span className='text-xl tracking-tight flex flex-row flex-wrap gap-1'>
 				<Link
 					to={`/story/${story.id}`}
 					className='underline'

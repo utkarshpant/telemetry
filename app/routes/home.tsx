@@ -31,7 +31,7 @@ export function NewStoryButton() {
 }
 
 function getNavTabClasses(active: boolean) {
-	return `text-lg px-4 py-1 rounded-full ${
+	return `text-base px-4 py-1 rounded-full ${
 		active ? 'bg-stone-400 dark:bg-stone-700' : 'bg-stone-200 dark:bg-stone-800'
 	}`;
 }
@@ -66,7 +66,7 @@ export default function Home() {
 		return (
 			<div className='flex flex-col-reverse md:flex-row items-center justify-center w-full h-screen overflow-hidden'>
 				<div className='h-full w-full md:w-1/4 p-6 md:p-12 md:pr-6 md:border-r border-r-stone-400 dark:border-r-stone-700 flex flex-col gap-6 content-evenly flex-1 shadow-2xl shadow-neutral-600 dark:shadow-neutral-100 md:shadow-none bg-clip-content'>
-					<h1 className='text-2xl md:text-6xl tracking-tighter'>About</h1>
+					<h1 className='text-2xl md:text-4xl tracking-tighter'>About</h1>
 					<div className='flex flex-col gap-1'>
 						<label
 							htmlFor='bio'
@@ -134,7 +134,7 @@ export default function Home() {
 					</div>
 				</div>
 				<div className='p-6 md:p-12 md:pl-6 w-full md:w-4/5 h-full flex flex-col gap-4 overflow-y-scroll'>
-					<h1 className='text-2xl md:text-6xl tracking-tighter'>
+					<h1 className='text-2xl md:text-4xl tracking-tighter'>
 						{user.firstName}&nbsp;
 						{user.lastName ? user.lastName : ''}{' '}
 						<a

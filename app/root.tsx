@@ -16,11 +16,11 @@ export const links: LinksFunction = () => [
 	},
 	{
 		rel: 'stylesheet',
-		href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap',
+		href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono&display=swap',
 	},
 	{
 		rel: 'stylesheet',
-		href: 'https://api.fontshare.com/v2/css?f[]=tanker@400&f[]=erode@1,2&f[]=supreme@1,2&display=swap',
+		href: 'https://api.fontshare.com/v2/css?f[]=sentient@1,2&display=swap',
 	},
 	{
 		rel: 'stylesheet',

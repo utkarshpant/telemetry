@@ -6,7 +6,7 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: [
-					'"Supreme"',
+					'"Inter"',
 					'ui-sans-serif',
 					'system-ui',
 					'sans-serif',
@@ -15,7 +15,7 @@ export default {
 					'"Segoe UI Symbol"',
 					'"Noto Color Emoji"',
 				],
-				serif: ['Erode'],
+				serif: ['Sentient'],
 				heading: ['Tanker', 'sans-serif'],
 				code: ['JetBrains Mono', 'serif'],
 			},
