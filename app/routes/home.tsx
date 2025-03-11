@@ -36,10 +36,21 @@ function getNavTabClasses(active: boolean) {
 	}`;
 }
 
-const textAreaStateMap = {
-	noError: ['oklch(0.145 0 0)', 'oklch(0.704 0.14 182.503)', 'oklch(0.398 0.07 227.392)'], // all good!
-	hasError: ['oklch(0.455 0.188 13.697)', 'oklch(0.555 0.163 48.998)', 'oklch(0.396 0.141 25.723)'],
-};
+// const textAreaStateMap = {
+// 	noError: ['oklch(0.145 0 0)', 'oklch(0.704 0.14 182.503)', 'oklch(0.398 0.07 227.392)'], // all good!
+// 	hasError: ['oklch(0.455 0.188 13.697)', 'oklch(0.555 0.163 48.998)', 'oklch(0.396 0.141 25.723)'],
+// };
+
+// const getTextAreaClasses = (textAreaLength: number, bioEditable: boolean) => {
+// 	if (bioEditable) {
+// 		if (textAreaLength <= 250) {
+// 			return 'before:from-stone-800 before:to-sky-700 ease-out duration-500 before:absolute before:left-[25%] before:top-[20%] before:w-[50%] before:h-[40%] before:bg-stone-800 before:rounded-full before:blur-[30px] before:brightness-125 before:bg-gradient-to-r  before:animate-blob before:-z-10 focus:ring-0 focus:outline-none outline-none before:bg-opacity-15';
+// 		}
+// 		else return 'before:from-stone-800 before:to-red-600 before:absolute before:left-[25%] before:top-[20%] before:w-[50%] before:h-[40%] before:bg-stone-800 before:rounded-full before:blur-[30px] before:brightness-125 before:bg-gradient-to-r before:animate-blob before:-z-10 focus:ring-0 focus:outline-none outline-none before:bg-opacity-15 after:absolute after:right-[5%] after:bottom-[10%] after:bg-opacity-45 after:w-[50%] after:h-[40%] after:bg-purple-600 after:rounded-full after:blur-[30px] after:brightness-125 after:animate-pulse after:-z-10 focus:ring-0 focus:outline-none outline-none before:bg-opacity-15'
+// 	} else {
+// 		return 'dark:bg-stone-700 bg-stone-400';
+// 	}
+// }
 
 export default function Home() {
 	const { user, signedIn } = useUser();
@@ -50,16 +61,6 @@ export default function Home() {
 	const location = useLocation();
 	const textAreaRef = useRef<HTMLSpanElement>(null);
 	const wrapperRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		if (wrapperRef.current && bioEditable) {
-			const [a, b, c] =
-				textAreaLength > 250 ? textAreaStateMap.hasError : textAreaStateMap.noError;
-			wrapperRef.current.style.setProperty('--color-a', a);
-			wrapperRef.current.style.setProperty('--color-b', b);
-			wrapperRef.current.style.setProperty('--color-c', c);
-		}
-	}, [bioEditable, textAreaLength]);
 
 	if (signedIn)
 		return (
@@ -79,45 +80,45 @@ export default function Home() {
 								/250)
 							</span>
 						</label>
-						<div
+						{/* <div
 							ref={wrapperRef}
-							className='relative bg-gradient-to-br from-[--color-a] to-[--color-b] via-[--color-c] [transition-property:_--color-a,_--color-b,_--color-c] ease-out duration-500 h-max md:rounded px-6 py-4 -mx-6 md:-ml-6 md:-mx-0 md:px-6 text-white backdrop-blur-2xl before:absolute before:left-[25%] before:top-[20%] before:w-[50%] before:h-[40%] before:bg-stone-800 before:rounded-full before:blur-[30px] before:brightness-125 before:bg-gradient-to-r before:from-[--color-a] before:to-[--color-b] before:animate-blob before:-z-10 focus:ring-0 focus:outline-none outline-none before:bg-opacity-15'
+							className={`relative ${getTextAreaClasses(textAreaLength, bioEditable)} transition-colors ease-out duration-500 h-max md:rounded px-6 py-4 -mx-6 md:-ml-6 md:-mx-0 md:px-6 text-white backdrop-blur-2xl `}
+						> */}
+						<div
+							contentEditable={bioEditable}
+							id='bio'
+							role='textbox'
+							tabIndex={0}
+							title='Your bio!'
+							ref={textAreaRef}
+							className='scroll no-scrollbar text-lg md:text-base bg-stone-200 dark:bg-stone-700 text-stone-900 dark:text-white rounded px-6 py-4 -mx-6 md:-ml-6 md:-mx-0 md:px-6 backdrop-blur-2xl'
+							onFocus={() => {
+								if (!bioEditable) {
+									setBioEditable(true);
+								}
+							}}
+							onClick={() => {
+								if (!bioEditable) {
+									setBioEditable(true);
+								}
+							}}
+							onBlur={() => {
+								setBioEditable(false);
+							}}
+							onKeyDown={(event) => {
+								if (event.key === 'Enter') {
+									setBioEditable(true);
+								}
+							}}
+							onInput={(event) => {
+								if (textAreaRef.current) {
+									setTextAreaLength(textAreaRef.current.innerText.length);
+								}
+							}}
 						>
-							<div
-								contentEditable={bioEditable}
-								id='bio'
-								role='textbox'
-								tabIndex={0}
-								title='Your bio!'
-								ref={textAreaRef}
-								className='scroll no-scrollbar text-lg md:text-base bg-none z-10'
-								onFocus={() => {
-									if (!bioEditable) {
-										setBioEditable(true);
-									}
-								}}
-								onClick={() => {
-									if (!bioEditable) {
-										setBioEditable(true);
-									}
-								}}
-								onBlur={() => {
-									setBioEditable(false);
-								}}
-								onKeyDown={(event) => {
-									if (event.key === 'Enter') {
-										setBioEditable(true);
-									}
-								}}
-								onInput={(event) => {
-									if (textAreaRef.current) {
-										setTextAreaLength(textAreaRef.current.innerText.length);
-									}
-								}}
-							>
-								{user.bio}
-							</div>
+							{user.bio}
 						</div>
+						{/* </div> */}
 					</div>
 					<div className='flex flex-col gap-1'>
 						<h2 className='text-sm uppercase text-stone-400'>Member since</h2>

@@ -23,7 +23,7 @@ export function Chip({ content, onClick, variant, icon }: ChipProps) {
 		<div
 			role='button'
 			tabIndex={0}
-			className={`flex items-center justify-between px-3 py-1 rounded-full cursor-pointer text-sm font-medium w-min no-underline ${getChipClasses(
+			className={`flex items-center gap-2 justify-between px-3 py-1 rounded-full cursor-pointer text-sm font-medium w-auto no-underline ${getChipClasses(
 				variant
 			)}`}
 			onClick={onClick}

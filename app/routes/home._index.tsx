@@ -1,11 +1,12 @@
 import { Story } from '@prisma/client';
 import { type LoaderFunction, json } from '@remix-run/node';
-import { Link, useLoaderData } from '@remix-run/react';
+import { Link, useFetcher, useLoaderData } from '@remix-run/react';
 import { prisma } from 'prisma/db.server';
 import { getLocaleDateString, getReadingTime } from 'utils/utils';
 import InfoIcon from '~/assets/info-icon';
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { Chip } from '~/components/Chip/Chip';
+import DeleteIcon from '~/assets/delete-material-icon.svg';
 
 export const loader: LoaderFunction = async ({ request }) => {
 	const session = await validateRequestAndReturnSession(request);
@@ -31,6 +32,7 @@ type StoryCardProps = { story: Story };
 function StoryCard({ story }: StoryCardProps) {
 	const publishDelta = Date.now() - Date.parse(story.publishedAt as string);
 	const daysSincePublished = Math.floor(publishDelta / (1000 * 60 * 60 * 24));
+	const fetcher = useFetcher({ key: 'delete'});
     return (
 		<div
 			key={story.id}
@@ -52,7 +54,7 @@ function StoryCard({ story }: StoryCardProps) {
 				{!story.isPublished ? (
 					<Chip
 						content='Draft'
-						variant='alert'
+						variant='info'
 					/>
 				) : null}
 			</span>
@@ -63,6 +65,12 @@ function StoryCard({ story }: StoryCardProps) {
 					: `Created on ${getLocaleDateString(story.createdAt)}.`}
 				{/* <span>{'•'}</span> */}
 				<p>{getReadingTime(story.wordCount)} minute read.</p>
+				<Chip icon={DeleteIcon} variant='alert' content='Delete' onClick={() => {
+					fetcher.submit(null, {
+						action: `/api/story/${story.id}/update`,
+						method: 'DELETE',
+					});
+				}} />
 			</span>
 		</div>
 	);
