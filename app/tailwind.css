@@ -14,6 +14,24 @@ html, body {
 	}
 }
 
+@layer base {
+    @property --color-a {
+        syntax: '<color>';
+        inherits: true;
+        initial-value: transparent;
+    }
+    @property --color-b {
+        syntax: '<color>';
+        inherits: true;
+        initial-value: transparent;
+    }
+    @property --color-c {
+        syntax: '<color>';
+        inherits: true;
+        initial-value: transparent;
+    }
+}
+
 @layer utilities {
     .underline-line-through {
         text-decoration: underline line-through;
