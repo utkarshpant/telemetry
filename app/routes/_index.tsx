@@ -12,6 +12,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 				? 'https://telemetry.blog'
 				: 'http://localhost:5173' + '/api/story/random?count=5'
 		}`;
+	console.log(storyUrl, "is being queried for random stories");
 	const randomStories: RandomStoryPreview[] = await fetch(
 		storyUrl,
 	).then((res) => {
