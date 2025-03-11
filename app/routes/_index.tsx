@@ -31,7 +31,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 function generateRandomStyles(seed: string): string {
 	const typefaces = ['font-serif', 'font-sans'];
 	const fontWeights = ['font-light', 'font-normal', 'font-semibold', 'font-bold'];
-	const colors = ['text-stone-400', 'text-stone-500', 'text-stone-700', 'text-amber-700'];
+	const colors = ['text-stone-400', 'text-stone-500', 'text-emerald-900', 'text-stone-700', 'text-amber-700',];
 	const randomTypeface = typefaces[Math.floor(Math.random() * typefaces.length)];
 	const randomFontWeight = fontWeights[Math.floor(Math.random() * fontWeights.length)];
 	const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -43,20 +43,20 @@ export default function Index() {
 	const { randomStories } = useLoaderData<{ randomStories: RandomStoryPreview[] }>();
 	return (
 		<div className='relative flex flex-col gap-2 w-full min-h-screen justify-center items-center'>
-			<p className='-z-0 absolute w-full h-full overflow-y-scroll overflow-x-clip no-scrollbar cursor-pointer select-none opacity-45 bg-stone-100 dark:bg-stone-900 md:p-16 text-5xl break-words md:text-[8rem] leading-[0.95] tracking-tightertext-justify blur-sm'>
+			<p className='-z-0 absolute w-full h-full overflow-y-scroll overflow-x-clip no-scrollbar cursor-pointer select-none bg-stone-100 dark:bg-stone-900 md:p-16 text-5xl break-words md:text-[8rem] tracking-tighter leading-[0.80] text-justify blur-[2px] opacity-85 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1.0)_0%,transparent_100%)]'>
 				{randomStories.map((story, index) => (
 					<Link
 						key={index}
 						to={`/story/${story.id}`}
-						className={`${generateRandomStyles(story.title)}`}					>
+						className={`${generateRandomStyles(story.title)} animate-fade-in`}					>
 						{story.title}&nbsp;
 					</Link>
 				))}
 			</p>
-			<p className='z-10'>This is the landing page.</p>
+			<p className='z-10 animate-fade-in'>Telemetry is a place to blog without distractions, and with your whole personality.</p>
 			<a
 				href='/sign-in'
-				className='z-10 underline'
+				className='z-10 underline animate-fade-in'
 			>
 				Start writing.
 			</a>

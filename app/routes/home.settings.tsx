@@ -65,10 +65,11 @@ type SessionCardProps = {
 	fetcher: ReturnType<typeof useFetcher>;
 };
 
-function SessionCard({ session, fetcher }: SessionCardProps) {
+function SessionCard({ session }: SessionCardProps) {
 	const { browser } = UAParser(session.userAgent as string);
-	const sessionFetcher = fetcher;
 	const { currentSession } = useLoaderData<typeof loader>();
+	const sessionFetcher = useFetcher({ key: 'session' });
+
     return (
 		<div
 			className={`flex flex-col p-4 md:-mx-2 items-baseline text-xl md:text-base w-full border-b border-b-stone-600 gap-2 ${
@@ -81,10 +82,12 @@ function SessionCard({ session, fetcher }: SessionCardProps) {
 			) : null}
 			<p className='text-stone-800 dark:text-stone-400 text-base md:text-sm'>{session.id}</p>
 			<span className={`flex flex-row gap-4 items-center`}>
+				<span className='hidden md:inline-block'>
 				<Chip
 					content={session.ipAddress as string}
 					variant='info'
 				/>
+				</span>
 				{browser.toString()}. Expires {getLocaleDateString(String(session.expiresAt))}.
 				{session.status !== 'ACTIVE' ? (
 					<Chip
@@ -121,7 +124,6 @@ export default function Settings() {
 		sessions: Session[];
 		currentSession: Pick<Session, 'expiresAt' | 'id' | 'ipAddress' | 'status' | 'userAgent'>;
 	}>();
-	const sessionFetcher = useFetcher({ key: 'session' });
 
 	if (signedIn)
 		return (
@@ -133,11 +135,10 @@ export default function Settings() {
 				</p>
 				<h1 className='text-xl'>Sessions (6 most recent)</h1>
 				<div className='flex flex-col my-2 h-full w-full text-xl'>
-					<SessionCard session={currentSession} fetcher={sessionFetcher} />
+					<SessionCard session={currentSession} />
                     {sessions.map((session) => (
 						<SessionCard
 							session={session}
-							fetcher={sessionFetcher}
 							key={session.id}
 						/>
 					))}
