@@ -38,7 +38,7 @@ function StoryCard({ story }: StoryCardProps) {
 			key={story.id}
 			className='flex flex-col gap-1 overflow-scroll no-scrollbar'
 		>
-			<span className='text-xl tracking-tight flex flex-row flex-wrap gap-1'>
+			<span className='text-xl font-medium tracking-tight flex flex-row flex-wrap gap-1'>
 				<Link
 					to={`/story/${story.id}`}
 					className='underline'
@@ -58,7 +58,7 @@ function StoryCard({ story }: StoryCardProps) {
 					/>
 				) : null}
 			</span>
-			<p className='text-lg'>{story.subtitle}</p>
+			<p className='text-lg text-stone-400 font-light'>{story.subtitle}</p>
 			<span className='text-sm text-stone-600 dark:text-stone-400 flex items-center border-b border-b-stone-400 dark:border-b-stone-600 pb-2 gap-2'>
 				{story.isPublished
 					? `Published on ${getLocaleDateString(story.publishedAt as string)}.`

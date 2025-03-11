@@ -21,6 +21,8 @@ import {
 } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
 import { useCallback, useRef, useState, useEffect } from 'react';
+import { $createSubtitleNode, $isSubtitleNode } from './nodes/SubtitleNode';
+import { $createTitleNode, $isTitleNode } from './nodes/TitleNode';
 
 export default function ToolbarPlugin() {
 	const [editor] = useLexicalComposerContext();
@@ -34,6 +36,7 @@ export default function ToolbarPlugin() {
 	const [isQuote, setIsQuote] = useState(false);
 	const [isSuperscript, setIsSuperscript] = useState(false);
 	const [isCode, setIsCode] = useState(false);
+	const [isSubtitle, setIsSubtitle] = useState(false);
 
 	const $updateToolbar = useCallback(() => {
 		const selection = $getSelection();
@@ -52,8 +55,9 @@ export default function ToolbarPlugin() {
 			});
 
 			if (element !== null) {
-				setIsHeading($isHeadingNode(element));
+				setIsHeading($isTitleNode(element));
 				setIsQuote($isQuoteNode(element));
+				setIsSubtitle($isSubtitleNode(element));
 			}
 		}
 	}, []);
@@ -185,7 +189,7 @@ export default function ToolbarPlugin() {
 								const selection = $getSelection();
 								if ($isRangeSelection(selection)) {
 									if (!isHeading) {
-										$setBlocksType(selection, () => $createHeadingNode('h2'));
+										$setBlocksType(selection, () => $createTitleNode());
 									} else {
 										$setBlocksType(selection, () => $createParagraphNode());
 									}
@@ -196,7 +200,26 @@ export default function ToolbarPlugin() {
 							isHeading ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
 						}`}
 					>
-						Heading
+						Title
+					</button>
+					<button
+						onClick={() => {
+							editor.update(() => {
+								const selection = $getSelection();
+								if ($isRangeSelection(selection)) {
+									if (!isSubtitle) {
+										$setBlocksType(selection, () => $createSubtitleNode());
+									} else {
+										$setBlocksType(selection, () => $createParagraphNode());
+									}
+								}
+							});
+						}}
+						className={`font-sans font-light rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
+							isSubtitle ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+						}`}
+					>
+						Subtitle
 					</button>
 					<button
 						onClick={() => {

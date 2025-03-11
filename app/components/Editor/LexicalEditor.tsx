@@ -23,6 +23,7 @@ import { useDebounceFetcher } from 'remix-utils/use-debounce-fetcher';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import EditorialPlugin from './EditorialPlugin';
 import { StoryLoaderData } from '~/routes/story_.$storyId';
+import { SubtitleNode } from './nodes/SubtitleNode';
 // import Header from '../Header/Header';
 
 const theme: EditorThemeClasses = {
@@ -98,7 +99,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 						},
 						onError,
 						editable: false,
-						nodes: [HeadingNode, QuoteNode, TitleNode],
+						nodes: [QuoteNode, TitleNode, SubtitleNode],
 					}}
 				>
 					{children}
@@ -133,24 +134,34 @@ export default function Editor({ children }: { children?: ReactNode }) {
 								const titleNodes = $getRoot()
 									.getChildren()
 									.filter((node) => node.getType() === 'title');
+								const subtitleNodes = $getRoot()
+									.getChildren()
+									.filter((node) => node.getType() === 'subtitle');
+								const formData = new FormData();
+								// content changed
+								const html = $generateHtmlFromNodes(editor);
+								formData.append('content', html);
+								const wordCount = $getRoot()
+									.getTextContent()
+									.split(/\s+/).length;
+								formData.append('wordCount', wordCount.toString());
+
+								// extract title
 								if (titleNodes.length > 0) {
 									const titleNode = titleNodes[0];
-									// content changed
-									const formData = new FormData();
-									const html = $generateHtmlFromNodes(editor);
-									const wordCount = $getRoot()
-										.getTextContent()
-										.split(/\s+/).length;
-									formData.append('content', html);
 									formData.append('title', titleNode?.getTextContent() || '');
-									formData.append('wordCount', wordCount.toString());
-									debouncedFetcher.submit(formData, {
-										method: 'POST',
-										action: `/api/story/${storyData.story.id}/update`,
-										debounceTimeout: 1000,
-										fetcherKey: 'story-update',
-									});
 								}
+								// extract subtitle
+								if (subtitleNodes.length > 0) {
+									const subtitleNode = subtitleNodes[0];
+									formData.append('subtitle', subtitleNode?.getTextContent() || '');
+								}
+								debouncedFetcher.submit(formData, {
+									method: 'POST',
+									action: `/api/story/${storyData.story.id}/update`,
+									debounceTimeout: 1000,
+									fetcherKey: 'story-update',
+								});
 							});
 						}}
 						ignoreSelectionChange
