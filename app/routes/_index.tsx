@@ -9,17 +9,15 @@ export const meta: MetaFunction = () => {
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	console.log("Received request")
 	const storyUrl = `${
-			process.env.NODE_ENV === 'production'
+			(process.env.NODE_ENV === 'production'
 				? 'https://telemetry.blog'
-				: 'http://localhost:5173' + '/api/story/random?count=5'
+				: 'http://localhost:5173') + '/api/story/random?count=5'
 		}`;
-	console.log(storyUrl, "is being queried for random stories");
 	const randomStories: RandomStoryPreview[] = await fetch(
 		storyUrl,
 	).then((res) => {
 		return res.json();
 	}).catch((error) => {
-		console.error(error);
 		return [];
 	});
 	return json({ randomStories });
