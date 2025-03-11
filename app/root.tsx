@@ -1,4 +1,4 @@
-import { json, Links, Meta, Outlet, redirect, Scripts, ScrollRestoration } from '@remix-run/react';
+import { isRouteErrorResponse, json, Links, Meta, Outlet, redirect, Scripts, ScrollRestoration, useRouteError } from '@remix-run/react';
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
 
 import stylesheet from './tailwind.css?url';
@@ -75,4 +75,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
 	return <Outlet />;
+}
+
+export function ErrorBoundary() {
+	const error = useRouteError();
+	if (isRouteErrorResponse(error)) {
+		return (
+			<div className='p-12'>
+				<h1 className='text-6xl'>Sorry, we couldn&apos;t find that page.</h1>
+			</div>
+		);
+	}
+	return <h1>Sorry, something went wrong. {JSON.stringify(error)}</h1>;
 }

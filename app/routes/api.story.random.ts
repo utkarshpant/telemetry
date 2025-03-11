@@ -92,7 +92,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         return json({ message: 'Invalid count' }, { status: 400 });
     }
 	try {
-		return await getSampledStoriesWithAuthors(count);
+		return json(await getSampledStoriesWithAuthors(count));
 	} catch (e) {
 		console.error(e);
 	}

@@ -29,7 +29,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 	}
 
 	if (request.method === 'DELETE') {
-		console.log('deleting story');
 		try {
 			await prisma.story.delete({
 				where: {
