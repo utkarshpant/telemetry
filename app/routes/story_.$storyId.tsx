@@ -2,7 +2,7 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { prisma } from 'prisma/db.server';
-import { json, type LoaderFunctionArgs } from '@remix-run/node';
+import { json, MetaFunction, type LoaderFunctionArgs } from '@remix-run/node';
 import { isRouteErrorResponse, useRouteError } from '@remix-run/react';
 import { type Story } from '@prisma/client';
 import LexicalEditor from './../components/Editor/LexicalEditor';
@@ -22,6 +22,20 @@ export type StoryLoaderData = {
 	};
 	allowEdits: boolean;
 	totalViews: number;
+};
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	return [
+		{ title: data?.story.title + ' | ' + data?.story.authors[0].user.firstName },
+		{
+			property: 'og:title',
+			content: data?.story.title + ' | ' + data?.story.authors[0].user.firstName,
+		},
+		{
+			name: 'description',
+			content: data?.story.subtitle,
+		},
+	];
 };
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
@@ -50,7 +64,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 			},
 		});
 
-		if ((!session?.has('userId') || story.authors.some((author) => author.userId !== session.get('userId'))) && !story.isPublished) {
+		if (
+			(!session?.has('userId') ||
+				story.authors.some((author) => author.userId !== session.get('userId'))) &&
+			!story.isPublished
+		) {
 			throw new Response("Sorry, we couldn't find that story.", { status: 404 });
 		}
 
@@ -84,7 +102,8 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 						date: new Date(),
 						count: 1,
 					},
-				}).catch((e) => {
+				})
+				.catch((e) => {
 					console.error(e);
 				});
 		}
