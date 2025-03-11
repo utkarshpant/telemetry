@@ -7,6 +7,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+	console.log("Received request")
 	const storyUrl = `${
 			process.env.NODE_ENV === 'production'
 				? 'https://telemetry.blog'
@@ -17,6 +18,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		storyUrl,
 	).then((res) => {
 		return res.json();
+	}).catch((error) => {
+		console.error(error);
+		return [];
 	});
 	return json({ randomStories });
 };
