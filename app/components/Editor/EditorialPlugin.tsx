@@ -38,11 +38,11 @@ export default function EditorialPlugin() {
 	return (
 		<div
 			className={
-				'animate-fade-in px-10 pb-12 md:pb-0 md:py-12 flex flex-col gap-4 w-full min-h-full font-sans md:text-sm text-base transition-all'
+				'animate-fade-in flex flex-col gap-4 w-full min-h-full font-sans md:text-sm text-base transition-all items-start print:hidden'
 			}
 			// unused border classes: border-t border-t-black dark:border-t-white md:border-t-transparent md:border-l md:border-l-black md:dark:border-l-white md:dark:border-t-transparent
 		>
-			<div className='text-xl md:text-base font-medium'>Editorial</div>
+			<div className='text-2xl md:text-4xl tracking-tight font-medium'>Editorial</div>
 			<div className='flex flex-col gap-4'>
 				<span className='flex flex-row gap-2 items-center'>
 					<img
@@ -100,10 +100,10 @@ export default function EditorialPlugin() {
 				</span>
 				<SignedIn>
 					{isUserAuthor ? (
-						<>
+						<div className='flex flex-row md:flex-col gap-2 h-min'>
 							<button
 								type='button'
-								className={`w-full md:w-56 px-4 py-2 rounded transition-colors ${
+								className={`w-full px-4 py-2 rounded transition-colors ${
 									editor.isEditable()
 										? 'bg-neutral-800 hover:bg-neutral-700'
 										: 'bg-sky-800 hover:bg-sky-700'
@@ -111,6 +111,7 @@ export default function EditorialPlugin() {
 								onClick={() => {
 									editor.update(() => {
 										editor.setEditable(!editor.isEditable());
+										editor.focus();
 									});
 								}}
 							>
@@ -137,7 +138,7 @@ export default function EditorialPlugin() {
 													className='h-4'
 												></img>
 											)}
-											<span>You&apos;re editing this story</span>
+											<span>Editing</span>
 										</div>
 									</div>
 								) : (
@@ -147,14 +148,14 @@ export default function EditorialPlugin() {
 											alt='Edit'
 											className='h-4'
 										></img>
-										<span>Edit this story</span>
+										<span>Edit</span>
 									</div>
 								)}
 							</button>
 							<button
 								type='button'
 								title='publish'
-								className={`w-full md:w-56 px-4 py-2 transition-all justify-center flex flex-row items-center gap-2 ${
+								className={`w-full px-4 py-2 transition-all justify-center flex flex-row items-center gap-2 ${
 									loaderData.story.isPublished
 										? 'bg-orange-600 hover:bg-orange-500'
 										: 'bg-green-600 hover:bg-green-500'
@@ -190,7 +191,7 @@ export default function EditorialPlugin() {
 							<button
 								type='button'
 								title='publish'
-								className={`w-full md:w-56 px-4 py-2 transition-all justify-center bg-red-600 hover:bg-red-700 font-semibold text-white rounded flex flex-row gap-2 items-center`}
+								className={`w-full px-4 py-2 transition-all justify-center bg-red-600 hover:bg-red-700 font-semibold text-white rounded flex flex-row gap-2 items-center`}
 								onClick={() => {
 									deleteFetcher.submit(null, {
 										action: `/api/story/${loaderData.story.id}/update`,
@@ -205,9 +206,9 @@ export default function EditorialPlugin() {
 								></img>
 								{deleteFetcher.state !== 'idle'
 									? 'Deleting...'
-									: 'Delete this story'}
+									: 'Delete'}
 							</button>
-						</>
+						</div>
 					) : null}
 
 					<hr className='mt-2' />

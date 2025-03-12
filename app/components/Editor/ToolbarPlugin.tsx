@@ -14,8 +14,6 @@ import {
 	TextNode,
 } from 'lexical';
 import {
-	$createHeadingNode,
-	$isHeadingNode,
 	$createQuoteNode,
 	$isQuoteNode,
 } from '@lexical/rich-text';
@@ -142,126 +140,124 @@ export default function ToolbarPlugin() {
 		);
 	}, [editor, $updateToolbar]);
 
-	if (editable) {
-		return (
-			<div
-				className='sticky top-2 left-2 z-10 md:m-0 md:mx-auto gap-2 flex flex-col px-4 py-2 w-full lg:w-10/12 animate-fade-in md:rounded font-sans bg-emerald-600 dark:bg-stone-600 text-white align-baseline shadow-lg'
-				ref={toolbarRef}
-			>
-				<span className='text-sm md:text-xs'>Formatting</span>
-				<hr className='border-white' />
-				<div>
-					<button
-						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
-						className={`${
-							isBold ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
-						} font-bold rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all`}
-					>
-						B
-					</button>
-					<button
-						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
-						className={`${
-							isItalic ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
-						} italic rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all`}
-					>
-						I
-					</button>
-					<button
-						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
-						className={`line-through decoration-white rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
-							isStrikethrough ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
-						}`}
-					>
-						S
-					</button>
-					<button
-						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
-						className={`underline decoration-white rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
-							isUnderline ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
-						}`}
-					>
-						U
-					</button>
-					<button
-						onClick={() => {
-							editor.update(() => {
-								const selection = $getSelection();
-								if ($isRangeSelection(selection)) {
-									if (!isHeading) {
-										$setBlocksType(selection, () => $createTitleNode());
-									} else {
-										$setBlocksType(selection, () => $createParagraphNode());
-									}
+	return (
+		<div
+			className={`transition duration-700 ${editable ? 'bg-emerald-600 dark:bg-stone-800' : 'bg-neutral-800'} sticky top-0 md:m-0 md:mx-auto gap-2 flex-col px-4 py-2 w-full animate-fade-in md:rounded font-sans  text-white align-baseline shadow-lg print:hidden flex`}
+			ref={toolbarRef}
+		>
+			<span className='text-sm md:text-xs'>Formatting</span>
+			<hr className='border-white' />
+			<div>
+				<button
+					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
+					className={`${
+						isBold ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					} font-bold rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all`}
+				>
+					B
+				</button>
+				<button
+					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
+					className={`${
+						isItalic ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					} italic rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all`}
+				>
+					I
+				</button>
+				<button
+					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
+					className={`line-through decoration-white rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
+						isStrikethrough ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					}`}
+				>
+					S
+				</button>
+				<button
+					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
+					className={`underline decoration-white rounded w-10 h-10 md:w-8 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
+						isUnderline ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					}`}
+				>
+					U
+				</button>
+				<button
+					onClick={() => {
+						editor.update(() => {
+							const selection = $getSelection();
+							if ($isRangeSelection(selection)) {
+								if (!isHeading) {
+									$setBlocksType(selection, () => $createTitleNode());
+								} else {
+									$setBlocksType(selection, () => $createParagraphNode());
 								}
-							});
-						}}
-						className={`font-sans font-semibold rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
-							isHeading ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
-						}`}
-					>
-						Title
-					</button>
-					<button
-						onClick={() => {
-							editor.update(() => {
-								const selection = $getSelection();
-								if ($isRangeSelection(selection)) {
-									if (!isSubtitle) {
-										$setBlocksType(selection, () => $createSubtitleNode());
-									} else {
-										$setBlocksType(selection, () => $createParagraphNode());
-									}
+							}
+						});
+					}}
+					className={`font-sans font-semibold rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
+						isHeading ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					}`}
+				>
+					Title
+				</button>
+				<button
+					onClick={() => {
+						editor.update(() => {
+							const selection = $getSelection();
+							if ($isRangeSelection(selection)) {
+								if (!isSubtitle) {
+									$setBlocksType(selection, () => $createSubtitleNode());
+								} else {
+									$setBlocksType(selection, () => $createParagraphNode());
 								}
-							});
-						}}
-						className={`font-sans font-light rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
-							isSubtitle ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
-						}`}
-					>
-						Subtitle
-					</button>
-					<button
-						onClick={() => {
-							editor.update(() => {
-								const selection = $getSelection();
-								if ($isRangeSelection(selection)) {
-									if (!isQuote) {
-										$setBlocksType(selection, () => $createQuoteNode());
-									} else {
-										$setBlocksType(selection, () => $createParagraphNode());
-									}
+							}
+						});
+					}}
+					className={`font-sans font-light rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
+						isSubtitle ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					}`}
+				>
+					Subtitle
+				</button>
+				<button
+					onClick={() => {
+						editor.update(() => {
+							const selection = $getSelection();
+							if ($isRangeSelection(selection)) {
+								if (!isQuote) {
+									$setBlocksType(selection, () => $createQuoteNode());
+								} else {
+									$setBlocksType(selection, () => $createParagraphNode());
 								}
-							});
-						}}
-						className={`italic rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
-							isQuote ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
-						}`}
-					>
-						&quot;Quote&quot;
-					</button>
-					<button
-						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript')}
-						className={`rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
-							isSuperscript ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
-						}`}
-					>
-						<span>
-							X<sup>2</sup>
-						</span>
-					</button>
-					<button
-						onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
-						className={`rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
-							isCode ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
-						}`}
-					>
-						<span className='font-code'>
-							&lt;/&gt;
-						</span>
-					</button>
-				</div>
+							}
+						});
+					}}
+					className={`italic rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
+						isQuote ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					}`}
+				>
+					&quot;Quote&quot;
+				</button>
+				<button
+					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'superscript')}
+					className={`rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
+						isSuperscript ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					}`}
+				>
+					<span>
+						X<sup>2</sup>
+					</span>
+				</button>
+				<button
+					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
+					className={`rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
+						isCode ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					}`}
+				>
+					<span className='font-code'>
+						&lt;/&gt;
+					</span>
+				</button>
 			</div>
-		);
-	}
+		</div>
+	);
 }

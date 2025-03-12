@@ -35,8 +35,9 @@ const theme: EditorThemeClasses = {
 		bold: 'font-bold',
 		italic: 'italic',
 		base: 'text-left',
-		code: 'code'
+		code: 'code',
 	},
+	paragraph: 'font-serif font-normal',
 	root: 'text-left',
 	ltr: 'text-left',
 	heading: {
@@ -45,7 +46,7 @@ const theme: EditorThemeClasses = {
 	},
 	quote: 'quote',
 	placeholder: 'placeholder',
-	code: 'code'
+	code: 'code',
 };
 
 function onError(error: Error) {
@@ -103,70 +104,76 @@ export default function Editor({ children }: { children?: ReactNode }) {
 					}}
 				>
 					{children}
-					<div
-						className='flex flex-col min-h-full w-full p-2'
-					>
-						{/* <Header /> */}
-						{storyData.allowEdits ? <ToolbarPlugin /> : null}
-						<RichTextPlugin
-							contentEditable={
-								<ContentEditable
-									className={`animate-fade-in px-8 lg:p-0 py-4 w-full lg:w-10/12 md:mx-auto h-full border-none focus:outline-none text-xl md:text-base font-serif text-left`}
-								/>
-							}
-							placeholder={
-								<div className='pointer-events-none absolute top-28 mt-3 md:top-24 left-4 text text-opacity-45 text-2xl font-serif'>
-									Enter some text...
-								</div>
-							}
-							ErrorBoundary={LexicalErrorBoundary}
-						/>
-						{searchParams.get('debug') === 'true' && <TreeViewPlugin />}
-					</div>
-					<div className={`h-full w-full md:w-1/3`}>
-						<EditorialPlugin />
+
+					<div className='flex flex-col md:flex-row items-center md:items-start w-full min-h-screen'>
+						<div className='relative min-h-[56vh] md:min-h-screen w-full md:w-4/5 no-scrollbar overflow-scroll md:border-r border-r-stone-400 dark:border-r-stone-700 shadow-2xl p-6 md:p-12 md:pr-6 md:print:pr-12 flex flex-col gap-1  flex-shrink-0'>
+							{storyData.allowEdits ? <ToolbarPlugin /> : null}
+							<RichTextPlugin
+								contentEditable={
+									<ContentEditable
+										className={`animate-fade-in w-full min-h-full flex-1`}
+									/>
+								}
+								placeholder={
+									<div className='pointer-events-none absolute top-28 mt-3 md:top-24 left-4 text text-opacity-45 text-2xl font-serif'>
+										Enter some text...
+									</div>
+								}
+								ErrorBoundary={LexicalErrorBoundary}
+							/>
+							{searchParams.get('debug') === 'true' && <TreeViewPlugin />}
+							<OnChangePlugin
+								onChange={(editorState, editor) => {
+									editorState.read(() => {
+										const titleNodes = $getRoot()
+											.getChildren()
+											.filter((node) => node.getType() === 'title');
+										const subtitleNodes = $getRoot()
+											.getChildren()
+											.filter((node) => node.getType() === 'subtitle');
+										const formData = new FormData();
+										// content changed
+										const html = $generateHtmlFromNodes(editor);
+										formData.append('content', html);
+										const wordCount = $getRoot()
+											.getTextContent()
+											.split(/\s+/).length;
+										formData.append('wordCount', wordCount.toString());
+
+										// extract title
+										if (titleNodes.length > 0) {
+											const titleNode = titleNodes[0];
+											formData.append(
+												'title',
+												titleNode?.getTextContent() || ''
+											);
+										}
+										// extract subtitle
+										if (subtitleNodes.length > 0) {
+											const subtitleNode = subtitleNodes[0];
+											formData.append(
+												'subtitle',
+												subtitleNode?.getTextContent() || ''
+											);
+										}
+										debouncedFetcher.submit(formData, {
+											method: 'POST',
+											action: `/api/story/${storyData.story.id}/update`,
+											debounceTimeout: 1000,
+											fetcherKey: 'story-update',
+										});
+									});
+								}}
+								ignoreSelectionChange
+							/>
+							<HistoryPlugin />
+						</div>
+						<div className='p-6 py-12 no-scrollbar w-full md:w-1/5 flex flex-col gap-4 overflow-y-scroll flex-shrink-0 min-h-full print:hidden h-full flex-1'>
+							<EditorialPlugin />
+						</div>
 					</div>
 					{/* <div className='flex flex-col md:flex-row gap-0'>
 					</div> */}
-					<OnChangePlugin
-						onChange={(editorState, editor) => {
-							editorState.read(() => {
-								const titleNodes = $getRoot()
-									.getChildren()
-									.filter((node) => node.getType() === 'title');
-								const subtitleNodes = $getRoot()
-									.getChildren()
-									.filter((node) => node.getType() === 'subtitle');
-								const formData = new FormData();
-								// content changed
-								const html = $generateHtmlFromNodes(editor);
-								formData.append('content', html);
-								const wordCount = $getRoot()
-									.getTextContent()
-									.split(/\s+/).length;
-								formData.append('wordCount', wordCount.toString());
-
-								// extract title
-								if (titleNodes.length > 0) {
-									const titleNode = titleNodes[0];
-									formData.append('title', titleNode?.getTextContent() || '');
-								}
-								// extract subtitle
-								if (subtitleNodes.length > 0) {
-									const subtitleNode = subtitleNodes[0];
-									formData.append('subtitle', subtitleNode?.getTextContent() || '');
-								}
-								debouncedFetcher.submit(formData, {
-									method: 'POST',
-									action: `/api/story/${storyData.story.id}/update`,
-									debounceTimeout: 1000,
-									fetcherKey: 'story-update',
-								});
-							});
-						}}
-						ignoreSelectionChange
-					/>
-					<HistoryPlugin />
 				</LexicalComposer>
 			)}
 		</ClientOnly>

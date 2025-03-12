@@ -12,7 +12,6 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-	console.log('Received request');
 	const storyUrl = `${
 		(process.env.NODE_ENV === 'production'
 			? 'https://telemetry.blog'

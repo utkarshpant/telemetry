@@ -88,7 +88,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const requestUrl = new URL(request.url);
 	const queryParams = new URLSearchParams(requestUrl.search);
 	const count = Number(queryParams.get('count'));
-	console.log("Received request to sample", count, "stories.");
+	"stories.");
     if (!count) {
         return json({ message: 'Invalid count' }, { status: 400 });
     }
