@@ -5,7 +5,7 @@ import { prisma } from 'prisma/db.server';
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import useUser from '~/hooks/useUser';
 import { UAParser } from 'ua-parser-js';
-import { getLocaleDateString } from 'utils/utils';
+import { getGreetingByTimeOfDay, getLocaleDateString } from 'utils/utils';
 import { Chip } from '~/components/Chip/Chip';
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -39,9 +39,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			createdAt: new Date(session.createdAt),
 			expiresAt: session.expiresAt ? new Date(session.expiresAt) : null,
 		}));
-        const currentSessionIndex = parsedSessions.findIndex((dbSession) => dbSession.id === session.id);
-        const currentSession = parsedSessions.splice(currentSessionIndex, 1)[0];
-        return json({
+		const currentSessionIndex = parsedSessions.findIndex(
+			(dbSession) => dbSession.id === session.id
+		);
+		const currentSession = parsedSessions.splice(currentSessionIndex, 1)[0];
+		return json({
 			sessions: parsedSessions,
 			currentSession,
 		});
@@ -70,9 +72,9 @@ function SessionCard({ session }: SessionCardProps) {
 	const { currentSession } = useLoaderData<typeof loader>();
 	const sessionFetcher = useFetcher({ key: 'session' });
 
-    return (
+	return (
 		<div
-			className={`flex flex-col p-4 md:-mx-2 items-baseline text-xl md:text-base w-full border-b border-b-stone-600 gap-2 ${
+			className={`flex flex-col p-4 md:-mx-2 items-baseline text-sm md:text-sm w-full border-b border-b-stone-600 gap-2 ${
 				session.id === currentSession.id ? 'bg-stone-200 dark:bg-stone-800' : ''
 			}`}
 			key={session.id}
@@ -80,15 +82,22 @@ function SessionCard({ session }: SessionCardProps) {
 			{session.id === currentSession.id ? (
 				<p className='uppercase text-stone-800 dark:text-stone-400'>Current Session</p>
 			) : null}
-			<p className='text-stone-800 dark:text-stone-400 text-base md:text-sm'>{session.id}</p>
-			<span className={`flex flex-row gap-4 items-center`}>
+			<p className='text-stone-800 dark:text-stone-400'>{session.id}</p>
+			<span
+				className={`flex flex-col md:flex-row gap-4 items-start md:items-center justify-start w-full`}
+			>
 				<span className='hidden md:inline-block'>
-				<Chip
-					content={session.ipAddress as string}
-					variant='info'
-				/>
+					<Chip
+						content={session.ipAddress as string}
+						variant='info'
+					/>
 				</span>
-				{browser.toString()}. Expires {getLocaleDateString(String(session.expiresAt))}.
+				{browser.toString()}.{' '}
+				{session.status !== 'ACTIVE' ||
+				new Date(String(session.expiresAt)).getTime() < Date.now()
+					? 'Expired'
+					: 'Expires'}{' '}
+				{getLocaleDateString(String(session.expiresAt))}.
 				{session.status !== 'ACTIVE' ? (
 					<Chip
 						variant='alert'
@@ -98,7 +107,7 @@ function SessionCard({ session }: SessionCardProps) {
 				{session.status === 'ACTIVE' ? (
 					<button
 						type='button'
-						className='bg-stone-700 px-2 py-1 rounded'
+						className='bg-green-600 px-2 py-1 rounded'
 						onClick={() => {
 							sessionFetcher.submit(null, {
 								action:
@@ -127,16 +136,17 @@ export default function Settings() {
 
 	if (signedIn)
 		return (
-			<div className='flex flex-col gap-2 text-base'>
+			<div className='flex flex-col gap-2 text-sm'>
 				<p>
-					Hi, {user.firstName}! This is where you can control every part of your Telemetry
-					experience. Update your email or username, change your profile photo, keep track
-					of sessions, and if needed, request deletion of your account.
+					{getGreetingByTimeOfDay()},&nbsp;{user.firstName}! This is where you can control every
+					part of your Telemetry experience. Update your email or username, change your
+					profile photo, keep track of sessions, and if needed, request deletion of your
+					account.
 				</p>
-				<h1 className='text-xl'>Sessions (6 most recent)</h1>
+				<h1 className='text-base font-medium'>Sessions (6 most recent)</h1>
 				<div className='flex flex-col my-2 h-full w-full text-xl'>
 					<SessionCard session={currentSession} />
-                    {sessions.map((session) => (
+					{sessions.map((session) => (
 						<SessionCard
 							session={session}
 							key={session.id}

@@ -11,6 +11,8 @@ import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { getLocaleDateString } from 'utils/utils';
 import useUser from '~/hooks/useUser';
 import { useEffect, useRef, useState } from 'react';
+import EditIcon from '~/assets/edit-material-icon.svg?url';
+import Header from '~/components/Header/Header';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const session = await validateRequestAndReturnSession(request);
@@ -24,7 +26,7 @@ export function NewStoryButton() {
 	const fetcher = useFetcher();
 	return (
 		<button
-			className='px-4 py-2 rounded w-52 text-base bg-green-600 hover:bg-green-500 hover:drop-shadow-lg hover:scale-[1.0125] transition-all text-white'
+			className='px-4 py-2 rounded-full text-sm bg-green-600 hover:drop-shadow-lg hover:scale-[1.0125] text-white flex flex-row gap-2 items-center h-14'
 			onClick={() => {
 				fetcher.submit(null, {
 					method: 'POST',
@@ -32,13 +34,18 @@ export function NewStoryButton() {
 				});
 			}}
 		>
-			Start a new story
+			<img
+				src={EditIcon}
+				alt='New story'
+				className='h-min w-min'
+			/>
+			<p className='md:group-hover:inline'>Inspired? Start writing.</p>
 		</button>
 	);
 }
 
 function getNavTabClasses(active: boolean) {
-	return `text-base px-4 py-1 rounded-full ${
+	return `text-sm px-4 py-1 rounded-full ${
 		active ? 'bg-stone-400 dark:bg-stone-700' : 'bg-stone-200 dark:bg-stone-800'
 	}`;
 }
@@ -71,109 +78,34 @@ export default function Home() {
 
 	if (signedIn)
 		return (
-			<div className='flex flex-col-reverse md:flex-row items-center justify-center w-full h-screen overflow-hidden'>
-				<div className='h-full w-full md:w-1/4 p-6 md:p-12 md:pr-6 md:border-r border-r-stone-400 dark:border-r-stone-700 flex flex-col gap-6 content-evenly flex-1 shadow-2xl shadow-neutral-600 dark:shadow-neutral-100 md:shadow-none bg-clip-content'>
-					<h1 className='text-2xl md:text-4xl tracking-tighter'>About</h1>
-					<div className='flex flex-col gap-1'>
-						<label
-							htmlFor='bio'
-							className='text-sm uppercase text-stone-400 flex flex-col gap-1'
-						>
-							<span>
-								Bio (
-								<span className={`${textAreaLength > 250 ? 'text-red-500' : ''}`}>
-									{textAreaLength}
-								</span>
-								/250)
-							</span>
-						</label>
-						{/* <div
-							ref={wrapperRef}
-							className={`relative ${getTextAreaClasses(textAreaLength, bioEditable)} transition-colors ease-out duration-500 h-max md:rounded px-6 py-4 -mx-6 md:-ml-6 md:-mx-0 md:px-6 text-white backdrop-blur-2xl `}
-						> */}
-						<div
-							contentEditable={bioEditable}
-							id='bio'
-							role='textbox'
-							tabIndex={0}
-							title='Your bio!'
-							ref={textAreaRef}
-							className='scroll no-scrollbar text-sm bg-stone-200 dark:bg-stone-700 text-stone-900 dark:text-white rounded px-6 py-4 -mx-6 md:-ml-6 md:-mx-0 md:px-6 backdrop-blur-2xl'
-							onFocus={() => {
-								if (!bioEditable) {
-									setBioEditable(true);
-								}
-							}}
-							onClick={() => {
-								if (!bioEditable) {
-									setBioEditable(true);
-								}
-							}}
-							onBlur={() => {
-								setBioEditable(false);
-							}}
-							onKeyDown={(event) => {
-								if (event.key === 'Enter') {
-									setBioEditable(true);
-								}
-							}}
-							onInput={(event) => {
-								if (textAreaRef.current) {
-									setTextAreaLength(textAreaRef.current.innerText.length);
-								}
-							}}
-						>
-							{user.bio}
+			<div className='min-h-screen no-scrollbar'>
+				<Header />
+				<div className='flex flex-col-reverse md:flex-row items-start justify-center w-full'>
+					<div className='p-6 md:p-12 w-full min-h-full flex flex-col gap-4 overflow-y-scroll flex-shrink-0 md:border-l border-l-stone-400 dark:border-l-stone-700 md:border-none no-scrollbar'>
+						<div className='flex flex-col gap-4 flex-1 h-full justify-center'>
+							<nav className='flex flex-row gap-4 items-center'>
+								<a
+									href='/home'
+									className={getNavTabClasses(location.pathname === '/home')}
+								>
+									Stories
+								</a>
+								<a
+									href='/home/settings'
+									className={getNavTabClasses(
+										location.pathname === '/home/settings'
+									)}
+								>
+									Settings
+								</a>
+							</nav>
+							<div className='h-full flex-1'>
+								<Outlet />
+							</div>
 						</div>
-						{/* </div> */}
-					</div>
-					<div className='flex flex-row justify-between items-center w-full gap-1'>
-						<div className='flex flex-col gap-2'>
-							<h2 className='text-sm uppercase text-stone-400'>Member since</h2>
-							<p className='text-sm'>
-								{getLocaleDateString(user.createdAt)}
-							</p>
+						<div className='fixed bottom-6 right-6 md:right-12'>
+							<NewStoryButton />
 						</div>
-						<div>
-							<p className='capitalize font-semibold bg-amber-500 w-14 h-14 rounded-full flex items-center justify-center mr-6'>
-								{user.firstName.charAt(0)}
-								{user.lastName?.charAt(0)}
-							</p>
-						</div>
-					</div>
-				</div>
-				<div className='p-6 md:p-12 md:pl-6 w-full md:w-4/5 h-full flex flex-col gap-4 overflow-y-scroll'>
-					<h1 className='text-2xl md:text-4xl tracking-tighter'>
-						{user.firstName}&nbsp;
-						{user.lastName ? user.lastName : ''}{' '}
-						<a
-							href={userHref}
-							className='text-stone-400 underline underline-offset-4 decoration-4'
-						>
-							({user.username})
-						</a>
-					</h1>
-					<div className='flex flex-col gap-4 flex-1 h-full'>
-						<nav className='flex flex-row gap-4'>
-							<a
-								href='/home'
-								className={getNavTabClasses(location.pathname === '/home')}
-							>
-								Stories
-							</a>
-							<a
-								href='/home/settings'
-								className={getNavTabClasses(location.pathname === '/home/settings')}
-							>
-								Settings
-							</a>
-						</nav>
-						<div className='h-full'>
-							<Outlet />
-						</div>
-					</div>
-					<div className='fixed bottom-6 right-12'>
-						<NewStoryButton />
 					</div>
 				</div>
 			</div>

@@ -1,18 +1,27 @@
 import useUser from '~/hooks/useUser';
 import SignedIn from '../SignedIn';
 import { SignOut } from '~/routes/_auth.sign-out';
+import { Link } from '@remix-run/react';
 
 export default function Header() {
 	const { user, signedIn } = useUser();
-	const greeting = getGreetingByTimeOfDay();
 	return (
-		<header className='fixed top-0 left-0 z-10 w-full py-6 px-6 flex flex-row justify-between items-baseline bg-white dark:bg-emerald-800 dark:text-white text-neutral-950'>
-			<div className='w-full md:w-10/12 flex flex-row justify-between m-auto'>
-				<SignedIn>
-					<span className='text-2xl tracking-tight font-bold'>Telemetry</span>
-				</SignedIn>
-				<SignOut />
-			</div>
+		<header className='z-10 w-full py-6 px-6 md:px-12 flex flex-row justify-between items-baseline border-b border-b-stone-700 dark:text-white text-neutral-950'>
+			<span className='flex flex-row justify-between w-full'>
+				<Link to="/" className='text-xl tracking-tighter font-medium'>Telemetry</Link>
+				{signedIn ? (
+					<h1 className='text-xl tracking-tight'>
+					{user.firstName}&nbsp;
+					{user.lastName ? user.lastName : ''}{' '}
+					<Link
+						to={`/${user.username}`}
+						className='text-xl tracking-tighter hover:underline underline-offset-4 decoration-4'
+					>
+						({user.username})
+					</Link>
+				</h1>
+				) : <Link to='/sign-in' className=' hover:underline tracking-tight text-xl'>Sign In</Link>}
+			</span>
 		</header>
 	);
 }

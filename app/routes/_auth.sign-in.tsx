@@ -162,6 +162,7 @@ export default function SignIn() {
 						<input
 							type='text'
 							name='email_or_username'
+							autoComplete='email'
 							defaultValue={getDefaultEmail(searchParams, location)}
 							className='p-2 rounded bg-neutral-200 dark:bg-stone-300 dark:bg-opacity-35 text-black dark:text-white'
 							aria-required='true'
@@ -181,6 +182,7 @@ export default function SignIn() {
 						</span>
 						<PasswordInput
 							name='password'
+							autoComplete='current-password'
 							aria-required='true'
 							required
 						></PasswordInput>
