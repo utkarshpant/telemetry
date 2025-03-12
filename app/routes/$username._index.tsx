@@ -1,20 +1,16 @@
 import { Story, User } from '@prisma/client';
-import { LoaderFunction, LoaderFunctionArgs } from '@remix-run/node';
+import { LoaderFunction } from '@remix-run/node';
 import {
 	Link,
 	MetaFunction,
-	Outlet,
 	json,
 	redirect,
-	useFetcher,
 	useHref,
 	useLoaderData,
-	useLocation,
 } from '@remix-run/react';
 import { prisma } from 'prisma/db.server';
 import { getLocaleDateString, getReadingTime } from 'utils/utils';
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
-import InfoIcon from '~/assets/info-icon';
 import { NewStoryButton } from './home';
 import { Chip } from '~/components/Chip/Chip';
 import { StoryCardProps } from './home._index';
@@ -76,7 +72,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 function StoryCard({ story }: StoryCardProps) {
 	if (story.publishedAt) {
-		const publishDelta = Date.now() - new Date(story.publishedAt);
+		const publishDelta = Date.now() - new Date(story.publishedAt).getTime();
 		const daysSincePublished = Math.floor(publishDelta / (1000 * 60 * 60 * 24));
 		return (
 			<div
@@ -111,7 +107,6 @@ function StoryCard({ story }: StoryCardProps) {
 
 export default function UserProfile() {
 	const { user, stories } = useLoaderData<{ user: User; stories: Story[] }>();
-	const userHref = useHref('.', { relative: 'path' });
 	return (
 		<>
 			<Header />
@@ -170,7 +165,7 @@ export default function UserProfile() {
 									))
 								) : (
 									<div className='w-full flex flex-row items-center text-sm dark:text-stone-500 text-stone-400 justify-center h-[56vh] text-center select-none'>
-										{user.firstName} hasn't published any stories &mdash; yet. They might have something in the works!
+										{user.firstName} hasn&apos;t published any stories &mdash; yet. They might have something in the works!
 									</div>
 								)}
 							</div>

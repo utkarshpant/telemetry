@@ -1,6 +1,4 @@
 import useUser from '~/hooks/useUser';
-import SignedIn from '../SignedIn';
-import { SignOut } from '~/routes/_auth.sign-out';
 import { Link } from '@remix-run/react';
 
 export default function Header() {

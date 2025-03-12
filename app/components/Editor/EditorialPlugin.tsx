@@ -1,4 +1,4 @@
-import { useFetcher, useLoaderData } from '@remix-run/react';
+import { useLoaderData } from '@remix-run/react';
 import { loader } from '~/routes/story_.$storyId';
 import EditIcon from '../../assets/edit-material-icon.svg?url'; // Adjust the path as necessary
 import InfoIcon from '../../assets/info-material-icon.svg?url'; // Adjust the path as necessary

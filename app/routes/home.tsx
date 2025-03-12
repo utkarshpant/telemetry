@@ -3,14 +3,10 @@ import {
 	Outlet,
 	redirect,
 	useFetcher,
-	useHref,
 	useLocation,
-	useRevalidator,
 } from '@remix-run/react';
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
-import { getLocaleDateString } from 'utils/utils';
 import useUser from '~/hooks/useUser';
-import { useEffect, useRef, useState } from 'react';
 import EditIcon from '~/assets/edit-material-icon.svg?url';
 import Header from '~/components/Header/Header';
 
@@ -67,15 +63,9 @@ function getNavTabClasses(active: boolean) {
 // }
 
 export default function Home() {
-	const { user, signedIn } = useUser();
-	const fetcher = useFetcher();
-	const [bioEditable, setBioEditable] = useState(false);
-	const [textAreaLength, setTextAreaLength] = useState(user?.bio?.length ?? 0);
-	const userHref = useHref('.', { relative: 'path' });
+	const { signedIn } = useUser();
 	const location = useLocation();
-	const textAreaRef = useRef<HTMLSpanElement>(null);
-	const wrapperRef = useRef<HTMLDivElement>(null);
-
+	
 	if (signedIn)
 		return (
 			<div className='min-h-screen no-scrollbar'>

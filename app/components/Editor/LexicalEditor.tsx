@@ -13,7 +13,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { ClientOnly } from 'remix-utils/client-only';
 import ToolbarPlugin from './ToolbarPlugin';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
+import { QuoteNode } from '@lexical/rich-text';
 import TreeViewPlugin from './TreeViewPlugin';
 import { useRouteLoaderData, useSearchParams } from '@remix-run/react';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
