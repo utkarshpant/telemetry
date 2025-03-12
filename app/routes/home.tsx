@@ -1,5 +1,12 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { Outlet, redirect, useFetcher, useHref, useLocation } from '@remix-run/react';
+import {
+	Outlet,
+	redirect,
+	useFetcher,
+	useHref,
+	useLocation,
+	useRevalidator,
+} from '@remix-run/react';
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { getLocaleDateString } from 'utils/utils';
 import useUser from '~/hooks/useUser';
@@ -91,7 +98,7 @@ export default function Home() {
 							tabIndex={0}
 							title='Your bio!'
 							ref={textAreaRef}
-							className='scroll no-scrollbar text-lg md:text-base bg-stone-200 dark:bg-stone-700 text-stone-900 dark:text-white rounded px-6 py-4 -mx-6 md:-ml-6 md:-mx-0 md:px-6 backdrop-blur-2xl'
+							className='scroll no-scrollbar text-sm bg-stone-200 dark:bg-stone-700 text-stone-900 dark:text-white rounded px-6 py-4 -mx-6 md:-ml-6 md:-mx-0 md:px-6 backdrop-blur-2xl'
 							onFocus={() => {
 								if (!bioEditable) {
 									setBioEditable(true);
@@ -120,17 +127,19 @@ export default function Home() {
 						</div>
 						{/* </div> */}
 					</div>
-					<div className='flex flex-col gap-1'>
-						<h2 className='text-sm uppercase text-stone-400'>Member since</h2>
-						<p className='text-lg md:text-base'>
-							{getLocaleDateString(user.createdAt)}
-						</p>
-					</div>
-					<div className='flex flex-col gap-1'>
-						<p className='capitalize font-semibold bg-amber-500 w-14 h-14 rounded-full flex items-center justify-center'>
-							{user.firstName.charAt(0)}
-							{user.lastName?.charAt(0)}
-						</p>
+					<div className='flex flex-row justify-between items-center w-full gap-1'>
+						<div className='flex flex-col gap-2'>
+							<h2 className='text-sm uppercase text-stone-400'>Member since</h2>
+							<p className='text-sm'>
+								{getLocaleDateString(user.createdAt)}
+							</p>
+						</div>
+						<div>
+							<p className='capitalize font-semibold bg-amber-500 w-14 h-14 rounded-full flex items-center justify-center mr-6'>
+								{user.firstName.charAt(0)}
+								{user.lastName?.charAt(0)}
+							</p>
+						</div>
 					</div>
 				</div>
 				<div className='p-6 md:p-12 md:pl-6 w-full md:w-4/5 h-full flex flex-col gap-4 overflow-y-scroll'>

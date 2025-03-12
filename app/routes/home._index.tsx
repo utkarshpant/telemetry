@@ -27,7 +27,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 	}
 };
 
-type StoryCardProps = { story: Story };
+export type StoryCardProps = { story: Story };
 
 function StoryCard({ story }: StoryCardProps) {
 	const publishDelta = Date.now() - Date.parse(story.publishedAt as string);

@@ -23,6 +23,7 @@ export default {
 				'fade-in': 'fade-in 2s ease-in-out',
 				blob: 'blob 8s infinite cubic-bezier(0.2, -0.68, 0.78, 0.048)',
 				'blob-reverse': 'blob 8s infinite cubic-bezier(0.615, 0.58, 0.78, 0.048) reverse',
+				grow: 'grow 120s ease-out'
 			},
 			keyframes: {
 				'fade-in': {
@@ -48,6 +49,14 @@ export default {
 						rotate: '90deg',
 					},
 				},
+				grow: {
+					'0%': {
+						transform: 'scale(1)',
+					},
+					'100%': {
+						transform: 'scale(1.55)',
+					},
+				}
 			},
 		},
 	},

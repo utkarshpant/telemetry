@@ -147,7 +147,7 @@ export default function SignIn() {
 		<div className='w-full h-full flex p-12'>
 			<authFetcher.Form
 				method='POST'
-				className='flex flex-col m-auto rounded gap-2 text-lg md:text-base'
+				className='flex flex-col m-auto rounded gap-2 text-base'
 				action='?index&intent=sign_in'
 			>
 				{/* Row 1 */}
