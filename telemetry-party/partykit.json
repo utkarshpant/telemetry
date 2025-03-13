@@ -1,0 +1,14 @@
+{
+  "$schema": "https://www.partykit.io/schema.json",
+  "name": "telemetry-party",
+  "main": "src/server.ts",
+  "compatibilityDate": "2025-03-12",
+  "serve": {
+    "path": "public",
+    "build": "src/client.ts"
+  },
+  "parties": {
+    "telemetry": "src/telemetry.ts",
+    "story": "src/story.ts"
+  }
+}
