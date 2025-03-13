@@ -119,8 +119,8 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 };
 
 export default function Story() {
-	const { story, allowEdits } = useLoaderData<StoryLoaderData>();
-	const partySocket = usePartySocket({
+	const { story } = useLoaderData<StoryLoaderData>();
+	usePartySocket({
 		host: 'https://telemetry-party.utkarshpant.partykit.dev',
 		party: 'story',
 		room: String(story.id),

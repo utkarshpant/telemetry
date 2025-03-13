@@ -1,9 +1,8 @@
 import { json, type LoaderFunctionArgs, type MetaFunction } from '@remix-run/node';
 import { RandomStoryPreview } from './api.story.random';
-import { usePartySocket } from 'partysocket/react';
 
 import { isRouteErrorResponse, Link, useLoaderData, useRouteError } from '@remix-run/react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const meta: MetaFunction = () => {
 	return [{ title: 'Telemetry' }, { name: 'description', content: 'This is Telemetry.' }];
