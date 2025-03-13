@@ -3,9 +3,10 @@
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { prisma } from 'prisma/db.server';
 import { json, MetaFunction, type LoaderFunctionArgs } from '@remix-run/node';
-import { isRouteErrorResponse, useRouteError } from '@remix-run/react';
+import { isRouteErrorResponse, useLoaderData, useRouteError } from '@remix-run/react';
 import { type Story } from '@prisma/client';
 import LexicalEditor from './../components/Editor/LexicalEditor';
+import { usePartySocket } from 'partysocket/react';
 
 export type StoryLoaderData = {
 	story: Story & {
@@ -118,9 +119,13 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 };
 
 export default function Story() {
-	return (
-		<LexicalEditor></LexicalEditor>
-	);
+	const { story, allowEdits } = useLoaderData<StoryLoaderData>();
+	const partySocket = usePartySocket({
+		host: 'https://telemetry-party.utkarshpant.partykit.dev',
+		party: 'story',
+		room: String(story.id),
+	});
+	return <LexicalEditor></LexicalEditor>;
 }
 
 export function ErrorBoundary() {
