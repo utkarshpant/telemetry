@@ -142,11 +142,9 @@ export default function ToolbarPlugin() {
 
 	return (
 		<div
-			className={`transition duration-700 ${editable ? 'bg-emerald-600 dark:bg-stone-800' : 'bg-neutral-800'} sticky top-0 md:m-0 md:mx-auto gap-2 flex-col px-4 py-2 w-full animate-fade-in md:rounded font-sans  text-white align-baseline shadow-lg print:hidden flex`}
+			className={`transition duration-700 ${editable ? 'bg-emerald-600 dark:bg-stone-800' : 'bg-neutral-800'} md:fixed static top-0 left-0 right-0 gap-0 md:gap-2 flex-col px-12 py-2 animate-fade-in font-sans text-white align-baseline shadow-lg print:hidden flex text-xs md:text-sm`}
 			ref={toolbarRef}
 		>
-			<span className='text-sm md:text-xs'>Formatting</span>
-			<hr className='border-white' />
 			<div>
 				<button
 					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}

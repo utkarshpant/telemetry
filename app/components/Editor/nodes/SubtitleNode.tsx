@@ -10,6 +10,7 @@ import {
 	NodeKey,
 	ParagraphNode,
 	RangeSelection,
+	SerializedElementNode,
 } from 'lexical';
 
 export class SubtitleNode extends ElementNode {
@@ -39,7 +40,7 @@ export class SubtitleNode extends ElementNode {
 	}
 
 	exportDOM(editor: LexicalEditor): DOMExportOutput {
-        const subtitle = document.createElement('h2');
+		const subtitle = document.createElement('h2');
 		subtitle.classList.add('editor-heading-2');
 		return { element: subtitle };
 	}
@@ -71,6 +72,14 @@ export class SubtitleNode extends ElementNode {
 		newElement.setFormat(this.getFormatType());
 		this.insertAfter(newElement, restoreSelection);
 		return newElement;
+	}
+
+	exportJSON(): SerializedElementNode {
+		return {
+			...super.exportJSON(),
+			type: SubtitleNode.getType(),
+			version: 1,
+		};
 	}
 }
 

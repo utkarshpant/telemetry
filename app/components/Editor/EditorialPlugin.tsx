@@ -43,7 +43,7 @@ export default function EditorialPlugin() {
 			// unused border classes: border-t border-t-black dark:border-t-white md:border-t-transparent md:border-l md:border-l-black md:dark:border-l-white md:dark:border-t-transparent
 		>
 			<div className='text-2xl md:text-4xl tracking-tight font-medium'>Editorial</div>
-			<div className='flex flex-col gap-4'>
+			<div className='flex flex-col gap-4 w-full'>
 				<span className='flex flex-row gap-2 items-center'>
 					<img
 						src={InfoIcon}
@@ -100,10 +100,10 @@ export default function EditorialPlugin() {
 				</span>
 				<SignedIn>
 					{isUserAuthor ? (
-						<div className='flex flex-row md:flex-col gap-2 h-min'>
+						<div className='flex flex-row gap-2 h-min'>
 							<button
 								type='button'
-								className={`w-full px-4 py-2 rounded transition-colors ${
+								className={`w-max px-4 py-2 rounded transition-colors ${
 									editor.isEditable()
 										? 'bg-neutral-800 hover:bg-neutral-700'
 										: 'bg-sky-800 hover:bg-sky-700'
@@ -155,7 +155,7 @@ export default function EditorialPlugin() {
 							<button
 								type='button'
 								title='publish'
-								className={`w-full px-4 py-2 transition-all justify-center flex flex-row items-center gap-2 ${
+								className={`w-max px-4 py-2 transition-all justify-center flex flex-row items-center gap-2 ${
 									loaderData.story.isPublished
 										? 'bg-orange-600 hover:bg-orange-500'
 										: 'bg-green-600 hover:bg-green-500'
@@ -191,7 +191,7 @@ export default function EditorialPlugin() {
 							<button
 								type='button'
 								title='publish'
-								className={`w-full px-4 py-2 transition-all justify-center bg-red-600 hover:bg-red-700 font-semibold text-white rounded flex flex-row gap-2 items-center`}
+								className={`w-max px-4 py-2 transition-all justify-center bg-red-600 hover:bg-red-700 font-semibold text-white rounded flex flex-row gap-2 items-center`}
 								onClick={() => {
 									deleteFetcher.submit(null, {
 										action: `/api/story/${loaderData.story.id}/update`,

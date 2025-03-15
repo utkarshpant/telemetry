@@ -17,14 +17,18 @@ import { QuoteNode } from '@lexical/rich-text';
 import TreeViewPlugin from './TreeViewPlugin';
 import { useRouteLoaderData, useSearchParams } from '@remix-run/react';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
-import { ReactNode } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { $createTitleNode, TitleNode } from './nodes/TitleNode';
 import { useDebounceFetcher } from 'remix-utils/use-debounce-fetcher';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import EditorialPlugin from './EditorialPlugin';
 import { StoryLoaderData } from '~/routes/story_.$storyId';
 import { SubtitleNode } from './nodes/SubtitleNode';
-// import Header from '../Header/Header';
+import usYProvider from 'y-partykit/react';
+import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
+import * as Y from 'yjs';
+import YPartyKitProvider from 'y-partykit/provider';
+import useUser from '~/hooks/useUser';
 
 const theme: EditorThemeClasses = {
 	// Define your theme here
@@ -53,12 +57,27 @@ function onError(error: Error) {
 	console.error(error);
 }
 
+function getDocFromMap(id: string, yjsDocMap: Map<string, Y.Doc>): Y.Doc {
+	let doc = yjsDocMap.get(id);
+
+	if (doc === undefined) {
+		doc = new Y.Doc();
+		yjsDocMap.set(id, doc);
+	} else {
+		doc.load();
+	}
+
+	return doc;
+}
+
 export default function Editor({ children }: { children?: ReactNode }) {
 	const [searchParams] = useSearchParams();
 	const storyData = useRouteLoaderData('routes/story_.$storyId') as unknown as StoryLoaderData;
 	const debouncedFetcher = useDebounceFetcher();
+	const { user } = useUser();
 
 	const $prePopulatedRichText = (editor: LexicalEditor) => {
+		console.log('Prepopulating rich text\n\n\n');
 		const root = $getRoot();
 		if ('story' in storyData) {
 			const { story } = storyData;
@@ -82,6 +101,28 @@ export default function Editor({ children }: { children?: ReactNode }) {
 			}
 		}
 	};
+
+	const yPartyKitProviderRef = useRef<YPartyKitProvider | null>(null);
+
+	const providerFactory = useCallback(
+		(id: string, yjsDocMap: Map<string, Y.Doc>) => {
+			console.log('Creating provider for', id);
+			const doc = getDocFromMap(id, yjsDocMap);
+			yPartyKitProviderRef.current = new YPartyKitProvider(
+				process.env.NODE_ENV === 'development'
+					? 'http://localhost:1999'
+					: 'https://telemetry-party.utkarshpant.partykit.dev',
+				String(storyData.story.id),
+				doc,
+				{
+					party: 'collab',
+				}
+			);
+			return yPartyKitProviderRef.current;
+		},
+		[storyData.story.id]
+	);
+
 	return (
 		<ClientOnly
 			fallback={
@@ -95,9 +136,10 @@ export default function Editor({ children }: { children?: ReactNode }) {
 					initialConfig={{
 						namespace: 'TelemetryEditor',
 						theme,
-						editorState(editor) {
-							$prePopulatedRichText(editor);
-						},
+						// editorState(editor) {
+						// 	$prePopulatedRichText(editor);
+						// },
+						editorState: storyData.allowEdits ? null : $prePopulatedRichText,
 						onError,
 						editable: false,
 						nodes: [QuoteNode, TitleNode, SubtitleNode],
@@ -105,8 +147,8 @@ export default function Editor({ children }: { children?: ReactNode }) {
 				>
 					{children}
 
-					<div className='flex flex-col md:flex-row items-center md:items-start w-full min-h-screen'>
-						<div className='relative min-h-[56vh] md:min-h-screen w-full md:w-4/5 no-scrollbar overflow-scroll md:border-r border-r-stone-400 dark:border-r-stone-700 shadow-2xl p-6 md:p-12 md:pr-6 md:print:pr-12 flex flex-col gap-1  flex-shrink-0'>
+					<div className='flex flex-col items-center md:items-start w-full min-h-screen'>
+						<div className='relative w-full no-scrollbar overflow-scroll border-b border-b-stone-400 dark:border-b-stone-700 p-6 md:p-12 md:print:pr-12 flex flex-col gap-1'>
 							{storyData.allowEdits ? <ToolbarPlugin /> : null}
 							<RichTextPlugin
 								contentEditable={
@@ -115,8 +157,8 @@ export default function Editor({ children }: { children?: ReactNode }) {
 									/>
 								}
 								placeholder={
-									<div className='pointer-events-none absolute top-28 mt-3 md:top-24 left-4 text text-opacity-45 text-2xl font-serif'>
-										Enter some text...
+									<div className='pointer-events-none absolute top-28 mt-3 md:top-24 left-4 text text-opacity-45 text-sm font-sans text-stone-500 h-full w-full flex items-center justify-center'>
+										Hang on tight, we&apos;re setting up for you!
 									</div>
 								}
 								ErrorBoundary={LexicalErrorBoundary}
@@ -168,12 +210,26 @@ export default function Editor({ children }: { children?: ReactNode }) {
 							/>
 							<HistoryPlugin />
 						</div>
-						<div className='p-6 py-12 no-scrollbar w-full md:w-1/5 flex flex-col gap-4 overflow-y-scroll flex-shrink-0 min-h-full print:hidden h-full flex-1'>
+						<div className='p-12 no-scrollbar w-full flex flex-col gap-4 overflow-y-scroll flex-shrink-0 min-h-full print:hidden h-full flex-1'>
 							<EditorialPlugin />
 						</div>
 					</div>
 					{/* <div className='flex flex-col md:flex-row gap-0'>
 					</div> */}
+					{storyData.allowEdits ? (
+						<CollaborationPlugin
+							id={storyData.story.id}
+							providerFactory={providerFactory}
+							initialEditorState={$prePopulatedRichText}
+							username={user?.firstName}
+							shouldBootstrap={false}
+							cursorColor={
+								storyData.story.authors.some((author) => author.userId === user?.id)
+									? 'red'
+									: 'grey'
+							}
+						/>
+					) : null}
 				</LexicalComposer>
 			)}
 		</ClientOnly>

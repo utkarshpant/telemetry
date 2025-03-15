@@ -10,6 +10,7 @@ import {
 	NodeKey,
 	ParagraphNode,
 	RangeSelection,
+	SerializedElementNode,
 } from 'lexical';
 
 export class TitleNode extends ElementNode {
@@ -61,6 +62,14 @@ export class TitleNode extends ElementNode {
 			}),
 		};
 	};
+
+	exportJSON(): SerializedElementNode {
+		return {
+			...super.exportJSON(),
+			type: TitleNode.getType(),
+			version: 1,
+		};
+	}
 
 	insertNewAfter(selection: RangeSelection, restoreSelection?: boolean): null | ParagraphNode {
 		const newElement = $createParagraphNode();
