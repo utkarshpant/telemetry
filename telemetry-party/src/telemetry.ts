@@ -11,8 +11,7 @@ export default class PostCounterServer implements Party.Server {
 	async onRequest(req: Party.Request) {
 		// update requests to update counts for a post
 		const request = await req.json<CountUpdate | Query>();
-        console.log("Request received!", request);
-		if (request.action === 'update') {
+        if (request.action === 'update') {
 			this.counts.set(request.postId, request.count);
 
 			// tell each connected telemetry client that counts have changed
@@ -23,11 +22,9 @@ export default class PostCounterServer implements Party.Server {
 		if (request.action === 'query') {
 			const counts: Record<string, number> = {};
             request.storyIds.forEach((storyId) => {
-                console.log("Count for", storyId, "is", this.counts.get(String(storyId)));
                 counts[storyId] = this.counts.get(String(storyId)) || 0;
             });
-            console.log("Final Counts", counts);
-			return new Response(JSON.stringify(counts), {
+            return new Response(JSON.stringify(counts), {
                 headers: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*',

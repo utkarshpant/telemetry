@@ -9,6 +9,10 @@
   },
   "parties": {
     "telemetry": "src/telemetry.ts",
-    "story": "src/story.ts"
+    "story": "src/story.ts",
+    "collab": "src/collab-server.ts"
+  },
+  "vars": {
+    "NODE_ENV": "production"
   }
 }
