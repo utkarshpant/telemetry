@@ -17,6 +17,7 @@ import { type YEvent, applyUpdate, Doc, Transaction } from 'yjs';
 import * as Y from 'yjs';
 import { TitleNode } from '../../app/components/Editor/nodes/TitleNode';
 import { SubtitleNode } from '../../app/components/Editor/nodes/SubtitleNode';
+import { QuoteNode } from '@lexical/rich-text';
 import { parseHTML } from 'linkedom';
 
 // Set up JSDOM before using any HTML generation functionality
@@ -37,10 +38,18 @@ export default class YjsServer implements Party.Server {
 					// then create a yjs doc from the lexical editor state and set it in the party room
 					const state = await fetch(
 						`${process.env.TELEMETRY_HOST}/api/story/${this.party.id}`
-					).then((res) => res.json());
+					)
+						.then(async (res) => {
+							const response = await res.json();
+							console.log('Fetched story state:', response);
+							return response;
+						})
+						.catch((e) => {
+							console.error('Error fetching story state:', e);
+						});
 
 					const result = withHeadlessCollaborationEditor(
-						[TitleNode, SubtitleNode],
+						[TitleNode, SubtitleNode, QuoteNode],
 						(editor, binding) => {
 							// try {
 								editor.setEditorState(editor.parseEditorState(state));
@@ -120,7 +129,7 @@ export default class YjsServer implements Party.Server {
 				// },
 			});
 		} catch (e) {
-			console.warn("An error occured somewhere in the code", e);
+			console.warn('An error occured somewhere in the code', e);
 		}
 	}
 }

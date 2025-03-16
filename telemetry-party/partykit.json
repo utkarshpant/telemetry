@@ -13,6 +13,7 @@
     "collab": "src/collab-server.ts"
   },
   "vars": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "TELEMETRY_HOST": "https://telemetry.blog"
   }
 }
