@@ -37,7 +37,7 @@ export default class YjsServer implements Party.Server {
 					// check if a yjs doc is already initialized. If not, get JSON state from api and initialize a lexical editor with it.
 					// then create a yjs doc from the lexical editor state and set it in the party room
 					const state = await fetch(
-						`${process.env.TELEMETRY_HOST}/api/story/${this.party.id}`
+						`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`
 					)
 						.then(async (res) => {
 							const response = await res.json();
