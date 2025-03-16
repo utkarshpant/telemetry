@@ -42,9 +42,9 @@ model Story {
 }
 
 model StoryViews {
+    id      Int @default(autoincrement())
     storyId Int
     date    DateTime @default(now())
-    count   Int      @default(0)
     story   Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
 
     @@id([storyId, date]) // Composite primary key

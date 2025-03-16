@@ -77,40 +77,37 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 			where: {
 				storyId: Number(storyId),
 			},
-			_sum: {
-				count: true,
-			},
+			_count: {
+				_all: true,			
+			}
 		});
 		if (
 			!session?.has('userId') ||
 			story.authors.some((author) => author.userId !== session.get('userId'))
 		) {
 			prisma.storyViews
-				.upsert({
-					where: {
-						storyId_date: {
-							storyId: Number(storyId),
-							date: new Date(),
-						},
-					},
-					update: {
-						count: {
-							increment: 1,
-						},
-					},
-					create: {
+				.create({
+					data: {
 						storyId: Number(storyId),
 						date: new Date(),
-						count: 1,
-					},
+					}
 				})
 				.catch((e) => {
 					console.error(e);
 				});
+			const totalViews = await prisma.storyViews.aggregate({
+				where: {
+					storyId: Number(storyId),
+				},
+				_count: {
+					_all: true,
+				}
+			}); 
+			
 		}
 		return json({
 			story,
-			totalViews: totalViews._sum.count ? totalViews._sum.count + 1 : 0,
+			totalViews: totalViews._count._all ?? 0,
 			allowEdits: story.authors.some((author) => author.userId === session?.get('userId')),
 		});
 	} catch {
