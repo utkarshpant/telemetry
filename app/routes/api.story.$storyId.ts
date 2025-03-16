@@ -1,23 +1,16 @@
 import { json, LoaderFunctionArgs } from '@remix-run/node';
 import { prisma } from 'prisma/db.server';
 import { createHeadlessEditor } from '@lexical/headless';
-import { $createTitleNode, TitleNode } from '~/components/Editor/nodes/TitleNode';
+import { TitleNode } from '~/components/Editor/nodes/TitleNode';
 import { QuoteNode } from '@lexical/rich-text';
 import { SubtitleNode } from '~/components/Editor/nodes/SubtitleNode';
 import {
-	$createParagraphNode,
-	$createTextNode,
 	$getRoot,
 	$getSelection,
-	$insertNodes,
-	LexicalEditor,
-	LexicalNode,
 	ParagraphNode,
-	RootNode,
 	TextNode,
 } from 'lexical';
 import { $generateNodesFromDOM } from '@lexical/html';
-import { Story } from '@prisma/client';
 import { JSDOM } from 'jsdom';
 
 export async function loader({ request, params }: LoaderFunctionArgs) {

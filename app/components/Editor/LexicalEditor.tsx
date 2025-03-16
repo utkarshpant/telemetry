@@ -77,7 +77,6 @@ export default function Editor({ children }: { children?: ReactNode }) {
 	const { user } = useUser();
 
 	const $prePopulatedRichText = (editor: LexicalEditor) => {
-		console.log('Prepopulating rich text\n\n\n');
 		const root = $getRoot();
 		if ('story' in storyData) {
 			const { story } = storyData;
@@ -103,14 +102,12 @@ export default function Editor({ children }: { children?: ReactNode }) {
 	};
 
 	const yPartyKitProviderRef = useRef<YPartyKitProvider | null>(null);
-
 	const providerFactory = useCallback(
 		(id: string, yjsDocMap: Map<string, Y.Doc>) => {
-			console.log('Creating provider for', id);
 			const doc = getDocFromMap(id, yjsDocMap);
 			yPartyKitProviderRef.current = new YPartyKitProvider(
 				process.env.NODE_ENV === 'development'
-					? 'http://localhost:1999'
+					? 'http://' + window.location.hostname + ":1999"
 					: 'https://telemetry-party.utkarshpant.partykit.dev',
 				String(storyData.story.id),
 				doc,
@@ -122,6 +119,8 @@ export default function Editor({ children }: { children?: ReactNode }) {
 		},
 		[storyData.story.id]
 	);
+
+	const userIsOwner = storyData.story.authors.findIndex((author) => author.userId === user?.id) === 0;
 
 	return (
 		<ClientOnly
@@ -224,7 +223,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 							username={user?.firstName}
 							shouldBootstrap={false}
 							cursorColor={
-								storyData.story.authors.some((author) => author.userId === user?.id)
+								userIsOwner
 									? 'red'
 									: 'grey'
 							}

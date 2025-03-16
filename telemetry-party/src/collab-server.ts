@@ -17,84 +17,110 @@ import { type YEvent, applyUpdate, Doc, Transaction } from 'yjs';
 import * as Y from 'yjs';
 import { TitleNode } from '../../app/components/Editor/nodes/TitleNode';
 import { SubtitleNode } from '../../app/components/Editor/nodes/SubtitleNode';
+import { parseHTML } from 'linkedom';
+
+// Set up JSDOM before using any HTML generation functionality
+const dom = parseHTML('<!DOCTYPE html><html><body></body></html>');
+globalThis.document = dom.window.document;
+globalThis.window = dom.window as any;
+globalThis.DOMParser = dom.window.DOMParser;
 
 export default class YjsServer implements Party.Server {
 	constructor(public party: Party.Room) {}
+
 	onConnect(conn: Party.Connection) {
 		try {
+			const roomId = this.party.id;
 			return onConnect(conn, this.party, {
 				load: async () => {
 					// check if a yjs doc is already initialized. If not, get JSON state from api and initialize a lexical editor with it.
 					// then create a yjs doc from the lexical editor state and set it in the party room
-					const state = await fetch(`${process.env.TELEMETRY_HOST}/api/story/${this.party.id}`).then((res) => res.json());
-					// const editorState = headlessConvertYDocStateToJSON(nodes, state);
-					try {
-						const yd = new Y.Doc();
-						withHeadlessCollaborationEditor([TitleNode, SubtitleNode], (editor, binding) => {
-							editor.setEditorState(editor.parseEditorState(state));
-					
-							const yDocState = Y.encodeStateAsUpdate(binding.doc);
-							// console.log("YDoc state", yDocState);
-							applyUpdate(yd, yDocState, { isUpdateRemote: false });
-							// console.log(editor.getEditorState());
-							return yd;
-						});
-					} catch (e) {
-						console.error(e);
-					}
-					
-				},
-				callback: {
-					// ...callback
-					handler(doc) {
-					// 	const yDocState = Y.encodeStateAsUpdate(doc);
-					// 	// apply the yjs doc state to a headless lexical editor, extract HTML and POST it to the API
-					// 	// to save the state
-					// 	withHeadlessCollaborationEditor([TitleNode, SubtitleNode], (editor, binding) => {
-					// 		applyUpdate(binding.doc, yDocState, { isUpdateRemote: true });
-					// 		editor.read(() => {
-					// 			const titleNodes = $getRoot()
-					// 				.getChildren()
-					// 				.filter((node) => node.getType() === 'title');
-					// 			const subtitleNodes = $getRoot()
-					// 				.getChildren()
-					// 				.filter((node) => node.getType() === 'subtitle');
-					// 			const formData = new FormData();
-					// 			// content changed
-					// 			const html = $generateHtmlFromNodes(editor);
-					// 			formData.append('content', html);
-					// 			const wordCount = $getRoot()
-					// 				.getTextContent()
-					// 				.split(/\s+/).length;
-					// 			formData.append('wordCount', wordCount.toString());
+					const state = await fetch(
+						`${process.env.TELEMETRY_HOST}/api/story/${this.party.id}`
+					).then((res) => res.json());
 
-					// 			// extract title
-					// 			if (titleNodes.length > 0) {
-					// 				const titleNode = titleNodes[0];
-					// 				formData.append(
-					// 					'title',
-					// 					titleNode?.getTextContent() || ''
-					// 				);
-					// 			}
-					// 			// extract subtitle
-					// 			if (subtitleNodes.length > 0) {
-					// 				const subtitleNode = subtitleNodes[0];
-					// 				formData.append(
-					// 					'subtitle',
-					// 					subtitleNode?.getTextContent() || ''
-					// 				);
-					// 			}
-					// 			fetch(`/api/story/${this.handler.}/update`, {
-					// 				method: 'POST',
-					// 				body: formData)
-					// 		});
-					// 	});
-					},
-					// debounceWait: 1000,
+					const result = withHeadlessCollaborationEditor(
+						[TitleNode, SubtitleNode],
+						(editor, binding) => {
+							// try {
+								editor.setEditorState(editor.parseEditorState(state));
+							// } catch (e) {
+							// 	console.error(
+							// 		'An error occured while setting editor state specifically!',
+							// 		e
+							// 	);
+							// }
+
+							// const yDocState = Y.encodeStateAsUpdate(binding.doc);
+							// Y.applyUpdate(ydoc, yDocState);
+							// return ydoc;
+							return binding.doc;
+						}
+					);
+					return result;
 				},
+				// callback: {
+				// 	handler(doc) {
+				// 		const yDocState = Y.encodeStateAsUpdate(doc);
+				// 		withHeadlessCollaborationEditor(
+				// 			[TitleNode, SubtitleNode],
+				// 			(editor, binding) => {
+				// 				applyUpdate(binding.doc, yDocState, { isUpdateRemote: true });
+				// 				editor.read(() => {
+				// 					const titleNodes = $getRoot()
+				// 						.getChildren()
+				// 						.filter((node) => node.getType() === 'title');
+				// 					const subtitleNodes = $getRoot()
+				// 						.getChildren()
+				// 						.filter((node) => node.getType() === 'subtitle');
+				// 					const formData = new FormData();
+
+				// 					// Now this will work with our JSDOM setup
+				// 					const html = $generateHtmlFromNodes(editor);
+				// 					formData.append('content', html);
+
+				// 					const wordCount = $getRoot()
+				// 						.getTextContent()
+				// 						.split(/\s+/).length;
+				// 					formData.append('wordCount', wordCount.toString());
+
+				// 					// extract title
+				// 					if (titleNodes.length > 0) {
+				// 						const titleNode = titleNodes[0];
+				// 						formData.append('title', titleNode?.getTextContent() || '');
+				// 					}
+				// 					// extract subtitle
+				// 					if (subtitleNodes.length > 0) {
+				// 						const subtitleNode = subtitleNodes[0];
+				// 						formData.append(
+				// 							'subtitle',
+				// 							subtitleNode?.getTextContent() || ''
+				// 						);
+				// 					}
+
+				// 					fetch(
+				// 						`${process.env.TELEMETRY_HOST}/api/story/${roomId}/update`,
+				// 						{
+				// 							method: 'POST',
+				// 							body: formData,
+				// 							headers: {
+				// 								'X-Telemetry-Party': roomId,
+				// 							}
+				// 						}
+				// 					)
+				// 						.then(async (res) => {
+				// 							console.log(await res.json());
+				// 						})
+				// 						.catch((err) => console.warn('Error updating story:', err));
+				// 				});
+				// 			}
+				// 		);
+				// 	},
+				// 	debounceWait: 1000, // Add debouncing to prevent too many updates
+				// },
 			});
 		} catch (e) {
-			console.error(e);
+			console.warn("An error occured somewhere in the code", e);
 		}
 	}
 }

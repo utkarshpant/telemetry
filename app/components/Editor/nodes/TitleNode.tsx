@@ -13,6 +13,13 @@ import {
 	SerializedElementNode,
 } from 'lexical';
 
+// Define interface for serialized TitleNode
+export interface SerializedTitleNode extends SerializedElementNode {
+    type: 'title';
+    version: 1;
+    placeholder?: string;
+}
+
 export class TitleNode extends ElementNode {
 	private placeholder: string = 'Untitled...';
 
@@ -26,6 +33,21 @@ export class TitleNode extends ElementNode {
 
 	static clone(node: TitleNode): TitleNode {
 		return new TitleNode(node.__key);
+	}
+
+	// Add static importJSON method
+	static importJSON(serializedNode: SerializedTitleNode): TitleNode {
+		const node = $createTitleNode();
+		node.updateFromJSON(serializedNode);
+		return node;
+	}
+
+	// Add updateFromJSON method
+	updateFromJSON(serializedNode: SerializedTitleNode) {
+		if (serializedNode.placeholder !== undefined) {
+			this.placeholder = serializedNode.placeholder;
+		}
+		return super.updateFromJSON(serializedNode);
 	}
 
 	createDOM(_config: EditorConfig, _editor: LexicalEditor): HTMLElement {

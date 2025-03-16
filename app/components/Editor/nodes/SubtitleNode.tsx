@@ -13,6 +13,13 @@ import {
 	SerializedElementNode,
 } from 'lexical';
 
+// Define interface for serialized TitleNode
+export interface SerializedSubtitleNode extends SerializedElementNode {
+	type: 'subtitle';
+	version: 1;
+	placeholder?: string;
+}
+
 export class SubtitleNode extends ElementNode {
 	private placeholder: string = 'Add a subtitle...';
 
@@ -72,6 +79,21 @@ export class SubtitleNode extends ElementNode {
 		newElement.setFormat(this.getFormatType());
 		this.insertAfter(newElement, restoreSelection);
 		return newElement;
+	}
+
+	// Add static importJSON method
+	static importJSON(serializedNode: SerializedSubtitleNode): SubtitleNode {
+		const node = $createSubtitleNode();
+		node.updateFromJSON(serializedNode);
+		return node;
+	}
+
+	// Add updateFromJSON method
+	updateFromJSON(serializedNode: SerializedSubtitleNode) {
+		if (serializedNode.placeholder !== undefined) {
+			this.placeholder = serializedNode.placeholder;
+		}
+		return super.updateFromJSON(serializedNode);
 	}
 
 	exportJSON(): SerializedElementNode {

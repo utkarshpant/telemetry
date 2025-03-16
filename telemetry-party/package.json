@@ -7,6 +7,7 @@
     "deploy": "partykit deploy"
   },
   "dependencies": {
+    "linkedom": "^0.18.9",
     "partysocket": "^1.0.3"
   },
   "devDependencies": {
