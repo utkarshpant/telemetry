@@ -78,19 +78,19 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 				storyId: Number(storyId),
 			},
 			_count: {
-				_all: true,			
-			}
+				_all: true,
+			},
 		});
 		if (
 			!session?.has('userId') ||
-			story.authors.some((author) => author.userId !== session.get('userId'))
+			!story.authors.some((author) => author.userId === session.get('userId'))
 		) {
 			prisma.storyViews
 				.create({
 					data: {
 						storyId: Number(storyId),
 						date: new Date(),
-					}
+					},
 				})
 				.catch((e) => {
 					console.error(e);
@@ -101,9 +101,8 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 				},
 				_count: {
 					_all: true,
-				}
-			}); 
-			
+				},
+			});
 		}
 		return json({
 			story,
