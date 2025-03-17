@@ -3,10 +3,12 @@ import { LoaderFunction } from '@remix-run/node';
 import {
 	Link,
 	MetaFunction,
+	isRouteErrorResponse,
 	json,
 	redirect,
 	useHref,
 	useLoaderData,
+	useRouteError,
 } from '@remix-run/react';
 import { prisma } from 'prisma/db.server';
 import { getLocaleDateString, getReadingTime } from 'utils/utils';
@@ -16,11 +18,10 @@ import { Chip } from '~/components/Chip/Chip';
 import { StoryCardProps } from './home._index';
 import Header from '~/components/Header/Header';
 
-export const meta: MetaFunction = ({ data }) => {
-	const { user } = data as { user: User };
-	if (user) {
+export const meta: MetaFunction = ({ data }: { data: { user: User } }) => {
+	if (data?.user) {
 		return [
-			{ title: `${user.firstName} | Telemetry` },
+			{ title: `${data?.user.firstName} | Telemetry` },
 			{ name: 'description', content: 'Sign into your Telemetry account.' },
 		];
 	}
@@ -32,19 +33,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 		return redirect('/home');
 	}
 	const { username } = params;
-	const user = await prisma.user
-		.findUnique({
+	try {
+		const user = await prisma.user.findUniqueOrThrow({
 			where: {
 				username,
 			},
-		})
-		.catch((error) => {
-			throw json({ message: 'User not found', error }, { status: 404 });
 		});
-	if (user) {
-		const { id } = user;
-		const stories = await prisma.story
-			.findMany({
+		if (user) {
+			const { id } = user;
+			const stories = await prisma.story.findMany({
 				where: {
 					authors: {
 						some: {
@@ -55,17 +52,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 						isPublished: true,
 					},
 				},
-			})
-			.catch((error) => {
-				throw json(
-					{ message: `There was an error fetching stories for ${user.username}.`, error },
-					{ status: 404 }
-				);
 			});
-		return json({
-			user,
-			stories,
-		});
+			return json({
+				user,
+				stories,
+			});
+		}
+	} catch (error) {
+		throw new Response("Sorry, we don't know who that is!", { status: 404 });
 	}
 	return null;
 };
@@ -107,6 +101,7 @@ function StoryCard({ story }: StoryCardProps) {
 
 export default function UserProfile() {
 	const { user, stories } = useLoaderData<{ user: User; stories: Story[] }>();
+	
 	return (
 		<>
 			<Header />
@@ -165,7 +160,8 @@ export default function UserProfile() {
 									))
 								) : (
 									<div className='w-full flex flex-row items-center text-sm dark:text-stone-500 text-stone-400 justify-center h-[56vh] text-center select-none'>
-										{user.firstName} hasn&apos;t published any stories &mdash; yet. They might have something in the works!
+										{user.firstName} hasn&apos;t published any stories &mdash;
+										yet. They might have something in the works!
 									</div>
 								)}
 							</div>
@@ -178,4 +174,29 @@ export default function UserProfile() {
 			</div>
 		</>
 	);
+}
+
+export function ErrorBoundary() {
+	const error = useRouteError();
+	if (isRouteErrorResponse(error)) {
+		return (
+			<div className='p-12'>
+				<h1 className='text-6xl'>
+					{error.status} {error.statusText}
+				</h1>
+				<p className='my-4'>{error.data}</p>
+			</div>
+		);
+	} else if (error instanceof Error) {
+		return (
+			<div>
+				<h1>Error</h1>
+				<p>{error.message}</p>
+				<p>The stack trace is:</p>
+				<pre>{error.stack}</pre>
+			</div>
+		);
+	} else {
+		return <h1>Unknown Error</h1>;
+	}
 }

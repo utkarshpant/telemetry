@@ -2,6 +2,10 @@ import { ActionFunctionArgs, json, redirect } from '@remix-run/node';
 import { prisma } from 'prisma/db.server';
 import { commitSession, validateRequestAndReturnSession } from '~/auth/utils.server';
 
+/** 
+ * This route is responsible for updating user information. Only an authenticated user can update their own information.
+ */
+
 export async function action({ request, params }: ActionFunctionArgs) {
 	const session = await validateRequestAndReturnSession(request);
 	if (!session || session.get('userId') !== Number(params.userId)) {

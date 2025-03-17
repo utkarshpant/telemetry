@@ -73,6 +73,11 @@ export const { getSession, commitSession, destroySession } = createSessionStorag
 			},
 			data: {
 				expiresAt: expires,
+				id: data.id,
+				userId: data.userId,
+				status: data.status,
+				ipAddress: data.ipAddress,
+				userAgent: data.userAgent,
 			},
 		});
 	},
