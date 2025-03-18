@@ -17,6 +17,7 @@ import { NewStoryButton } from './home';
 import { Chip } from '~/components/Chip/Chip';
 import { StoryCardProps } from './home._index';
 import Header from '~/components/Header/Header';
+import { RandomStoryBackground, RandomStoryBackgroundErrorBoundary } from '~/components/RandomStoryBackground';
 
 export const meta: MetaFunction = ({ data }: { data: { user: User } }) => {
 	if (data?.user) {
@@ -197,12 +198,15 @@ export function ErrorBoundary() {
 	const error = useRouteError();
 	if (isRouteErrorResponse(error)) {
 		return (
-			<div className='p-12'>
+			<RandomStoryBackgroundErrorBoundary>
+			<div className='p-12 bg-neutral-950 bg-opacity-80 h-screen w-screen z-0'>
 				<h1 className='text-6xl'>
 					{error.status} {error.statusText}
 				</h1>
 				<p className='my-4'>{error.data}</p>
+				<p>Head over to <Link to='/' className='underline'>the home page</Link> to check out what Telemetry members are writing, or even <Link to='/sign-up' className='underline'>sign-up</Link> yourself!</p>
 			</div>
+			</RandomStoryBackgroundErrorBoundary>
 		);
 	} else if (error instanceof Error) {
 		return (
