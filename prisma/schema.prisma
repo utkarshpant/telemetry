@@ -1,104 +1,115 @@
 generator client {
-    provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-    id                Int             @id @default(autoincrement())
-    firstName         String          @db.VarChar(255)
-    lastName          String?         @db.VarChar(100)
-    email             String          @unique
-    username          String          @unique
-    bio               String?         @db.VarChar(255)
-    profilePictureUrl String?
-    createdAt         DateTime        @default(now())
-    updatedAt         DateTime        @updatedAt
-    sessions          Session[]
-    stories           StoryAuthor[]
-    images            Image[]
-    credentials       UserCredential?
+  id                Int             @id @default(autoincrement())
+  email             String          @unique
+  username          String          @unique
+  bio               String?         @db.VarChar(255)
+  profilePictureUrl String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  firstName         String          @db.VarChar(255)
+  lastName          String?         @db.VarChar(100)
+  images            Image[]
+  sessions          Session[]
+  stories           StoryAuthor[]
+  credentials       UserCredential?
 
-    @@map("users")
+  @@map("users")
 }
 
 model Story {
-    id          Int           @id @default(autoincrement())
-    title       String
-    subtitle    String?
-    content     String
-    createdAt   DateTime      @default(now())
-    updatedAt   DateTime      @updatedAt
-    wordCount   Int           @default(0)
-    publishedAt DateTime?
-    authors     StoryAuthor[]
-    views       StoryViews[]
-    isPublished Boolean       @default(false)
+  id          Int           @id @default(autoincrement())
+  title       String
+  subtitle    String?
+  content     String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  isPublished Boolean       @default(false)
+  publishedAt DateTime?
+  wordCount   Int           @default(0)
+  authors     StoryAuthor[]
+  views       StoryViews[]
 
-    @@map("stories")
+  @@map("stories")
 }
 
 model StoryViews {
-    id      Int @default(autoincrement())
-    storyId Int
-    date    DateTime @default(now())
-    story   Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  storyId Int
+  date    DateTime @default(now())
+  id      Int      @default(autoincrement())
+  story   Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
 
-    @@id([storyId, date]) // Composite primary key
-    @@map("story_views")
+  @@id([storyId, date])
+  @@map("story_views")
 }
 
 model StoryAuthor {
-    story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
-    storyId   Int
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId    Int
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  storyId   Int
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@id([storyId, userId]) // Composite primary key
-    @@map("story_authors")
+  @@id([storyId, userId])
+  @@map("story_authors")
 }
 
 model Image {
-    id         String  @id @default(uuid())
-    externalId String
-    url        String
-    alt        String?
-    ownerId    Int
-    owner      User    @relation(fields: [ownerId], references: [id])
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+  id         String   @id @default(uuid())
+  externalId String
+  url        String
+  alt        String?
+  ownerId    Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  owner      User     @relation(fields: [ownerId], references: [id])
 
-    @@map("images")
+  @@map("images")
 }
 
 model UserCredential {
-    userId       Int    @id
-    passwordHash String
-    user         User   @relation(fields: [userId], references: [id])
+  userId       Int    @id
+  passwordHash String
+  user         User   @relation(fields: [userId], references: [id])
 
-    @@map("user_credentials")
+  @@map("user_credentials")
 }
 
 model Session {
-    id        String        @id @default(uuid())
-    userId    Int
-    createdAt DateTime      @default(now())
-    expiresAt DateTime?
-    ipAddress String?
-    userAgent String?
-    status    SessionStatus @default(ACTIVE)
-    user      User          @relation(fields: [userId], references: [id])
+  id        String        @id @default(uuid())
+  userId    Int
+  createdAt DateTime      @default(now())
+  expiresAt DateTime?
+  ipAddress String?
+  userAgent String?
+  status    SessionStatus @default(ACTIVE)
+  user      User          @relation(fields: [userId], references: [id])
 
-    @@map("sessions")
+  @@map("sessions")
+}
+
+model view_count_refresh_log {
+  viewname     String    @id
+  refreshed_at DateTime? @db.Timestamptz(6)
+}
+
+view story_view_counts {
+    storyId Int @id
+    totalViews Int
 }
 
 enum SessionStatus {
-    ACTIVE
-    INACTIVE
-    EXPIRED
+  ACTIVE
+  INACTIVE
+  EXPIRED
 }

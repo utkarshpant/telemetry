@@ -5,7 +5,24 @@ import { isRouteErrorResponse, Link, useLoaderData, useRouteError } from '@remix
 import { useEffect, useState } from 'react';
 
 export const meta: MetaFunction = () => {
-	return [{ title: 'Telemetry' }, { name: 'description', content: 'This is Telemetry.' }];
+	return [{ title: 'Telemetry' }, { name: 'description', content: 'This is Telemetry.' },
+		{
+			property: 'og:title',
+			content: 'Telemetry',
+		},
+		{
+			property: 'og:type',
+			content: 'website',
+		},
+		{
+			property: 'og:description',
+			content: 'Telemetry is a place to blog without distractions, and with your whole personality.',
+		},
+		{
+			property: 'og:url',
+			content: 'https://telemetry.blog',
+		}
+	];
 };
 
 /**
@@ -43,36 +60,47 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 		.catch((error) => {
 			return [];
 		});
-	randomStories.forEach((story) => story.style = generateRandomStyles(story.id));	
+	randomStories.forEach((story) => (story.style = generateRandomStyles(story.id)));
 	return json({ randomStories });
 };
 
 function CountBadge({ count }: { count: number }) {
 	return (
-		<span className='bg-amber-400 rounded-full font-semibold font-sans px-4 py-2 md:py-2 md:px-6 text-stone-900 text-2xl md:text-6xl not-italic -my-10 animate-fade-in'>{count}</span>
-	)
+		<span className='bg-amber-400 rounded-full font-semibold font-sans px-4 py-2 md:py-2 md:px-6 text-stone-900 text-2xl md:text-6xl not-italic -my-10 animate-fade-in'>
+			{count}
+		</span>
+	);
 }
 
 export default function Index() {
-	const { randomStories } = useLoaderData<{ randomStories: (RandomStoryPreview & { style: string })[] }>();
+	const { randomStories } = useLoaderData<{
+		randomStories: (RandomStoryPreview & { style: string })[];
+	}>();
 	const defaultCounts = Object.fromEntries(randomStories.map((story) => [story.id, 0]));
 	const [counts, setCounts] = useState<Record<string, number>>(defaultCounts);
 
 	useEffect(() => {
 		(async () => {
-			const users = await fetch("https://telemetry-party.utkarshpant.partykit.dev/parties/telemetry/central", {
-				body: JSON.stringify({ storyIds: randomStories.map((story) => story.id), action: 'query' }),
-				method: 'POST',
-					
-			}).then(res => {
-				return res.json();
-			}).catch((error) => {
-				console.log(error);
-			});
+			const users = await fetch(
+				'https://telemetry-party.utkarshpant.partykit.dev/parties/telemetry/central',
+				{
+					body: JSON.stringify({
+						storyIds: randomStories.map((story) => story.id),
+						action: 'query',
+					}),
+					method: 'POST',
+				}
+			)
+				.then((res) => {
+					return res.json();
+				})
+				.catch((error) => {
+					console.log(error);
+				});
 			setCounts(users);
 		})();
 	}, []);
-	
+
 	return (
 		<div className='relative flex flex-col gap-2 w-full min-h-screen justify-center items-center overflow-hide no-scrollbar'>
 			<p className='-z-0 absolute w-full h-full overflow-y-scroll overflow-x-clip no-scrollbar cursor-pointer select-none bg-stone-100 dark:bg-stone-900 md:p-16 text-5xl break-words md:text-[8rem] tracking-tighter leading-[0.80] text-justify blur-[2px] opacity-85 [mask-image:linear-gradient(to_bottom,rgba(0,0,0,1.0)_0%,transparent_100%)] animate-grow no-scrollbar'>
@@ -82,7 +110,8 @@ export default function Index() {
 						to={`/story/${story.id}`}
 						className={`${story.style} animate-fade-in`}
 					>
-						{story.title} <CountBadge count={counts[story.id]} />&nbsp;
+						{story.title} <CountBadge count={counts[story.id]} />
+						&nbsp;
 					</Link>
 				))}
 			</p>

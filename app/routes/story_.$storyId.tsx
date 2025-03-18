@@ -7,6 +7,7 @@ import { isRouteErrorResponse, useLoaderData, useRouteError } from '@remix-run/r
 import { type Story } from '@prisma/client';
 import LexicalEditor from './../components/Editor/LexicalEditor';
 import { usePartySocket } from 'partysocket/react';
+import Header from '~/components/Header/Header';
 
 export type StoryLoaderData = {
 	story: Story & {
@@ -25,16 +26,37 @@ export type StoryLoaderData = {
 	totalViews: number;
 };
 
+const getAuthorsString = (authors: StoryLoaderData['story']['authors']) => {
+	return authors
+		.map((author) => `${author.user.firstName} ${author.user.lastName ?? ''}`.trim())
+		.join(', ');
+};
+
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	return [
 		{ title: data?.story.title + ' | ' + data?.story.authors[0].user.firstName },
 		{
 			property: 'og:title',
-			content: data?.story.title + ' | ' + data?.story.authors[0].user.firstName,
+			content:
+				data?.story.title +
+				' | ' +
+				(data?.story.authors ? getAuthorsString(data.story.authors) : ''),
 		},
 		{
 			name: 'description',
 			content: data?.story.subtitle,
+		},
+		{
+			property: 'og:type',
+			content: 'article',
+		},
+		{
+			property: 'og:description',
+			content: data?.story.subtitle,
+		},
+		{
+			property: 'og:url',
+			content: `https://telemetry.blog/story/${data?.story.id}`,
 		},
 	];
 };
@@ -113,7 +135,12 @@ export default function Story() {
 		party: 'story',
 		room: String(story.id),
 	});
-	return <LexicalEditor></LexicalEditor>;
+	return (
+		<>
+			<Header />
+			<LexicalEditor></LexicalEditor>
+		</>
+	);
 }
 
 export function ErrorBoundary() {

@@ -42,7 +42,7 @@ html, body {
     }
 
     .editor-heading-2 {
-        @apply text-3xl font-sans font-light tracking-tight border-t py-2 mb-4 inline-block w-full border-t-stone-500;
+        @apply text-3xl font-sans font-light tracking-tight border-t py-2 mb-4 inline-block w-full border-t-stone-700;
     }
 
     .editor-heading-1 {

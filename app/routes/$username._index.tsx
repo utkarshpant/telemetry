@@ -22,7 +22,22 @@ export const meta: MetaFunction = ({ data }: { data: { user: User } }) => {
 	if (data?.user) {
 		return [
 			{ title: `${data?.user.firstName} | Telemetry` },
-			{ name: 'description', content: 'Sign into your Telemetry account.' },
+			{
+				name: 'description',
+				content: 'Sign into your Telemetry account.',
+			},
+			{
+				property: 'og:type',
+				content: 'profile',
+			},
+			{
+				property: 'og:description',
+				content: `These are ${data.user.firstName}'s stories on Telemetry.`,
+			},
+			{
+				property: 'og:url',
+				content: `https://telemetry.blog/${data.user.username}`,
+			},
 		];
 	}
 };
@@ -87,7 +102,9 @@ function StoryCard({ story }: StoryCardProps) {
 						/>
 					) : null}
 				</span>
-				<p className='text-base text-stone-400 font-light'>{story.subtitle}</p>
+				<p className='text-base text-stone-700 dark:text-stone-400 font-light'>
+					{story.subtitle}
+				</p>
 				<span className='text-xs text-stone-600 dark:text-stone-400 border-b border-b-stone-400 dark:border-b-stone-600 pb-2 flex flex-row gap-1 flex-wrap items-center'>
 					{story.isPublished
 						? `Published on ${getLocaleDateString(story.publishedAt)}.`
@@ -101,7 +118,7 @@ function StoryCard({ story }: StoryCardProps) {
 
 export default function UserProfile() {
 	const { user, stories } = useLoaderData<{ user: User; stories: Story[] }>();
-	
+
 	return (
 		<>
 			<Header />
@@ -145,7 +162,7 @@ export default function UserProfile() {
 				</div>
 				<div className='p-6 md:p-12 md:pl-6 w-full md:w-4/5 h-min-h-screen flex flex-col gap-4 overflow-y-scroll md:border-l border-l-stone-700 dark:border-l-stone-700 no-scrollbar flex-1 flex-shrink-0 md:min-h-screen'>
 					<div className='flex flex-col gap-4 flex-1 h-full no-scrollbar'>
-						<span className='text-base font-light'>
+						<span className='text-xl font-medium'>
 							{' '}
 							{user.firstName}&apos;s stories
 						</span>

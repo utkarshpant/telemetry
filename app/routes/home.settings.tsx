@@ -107,7 +107,7 @@ function SessionCard({ session }: SessionCardProps) {
 				{session.status === 'ACTIVE' ? (
 					<button
 						type='button'
-						className='bg-green-600 px-2 py-1 rounded'
+						className='bg-green-600 px-2 py-1 rounded text-white'
 						onClick={() => {
 							sessionFetcher.submit(null, {
 								action:

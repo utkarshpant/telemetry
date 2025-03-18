@@ -1,4 +1,4 @@
-import { isRouteErrorResponse, json, Links, Meta, Outlet, redirect, Scripts, ScrollRestoration, useRouteError } from '@remix-run/react';
+import { isRouteErrorResponse, json, Links, Meta, MetaFunction, Outlet, redirect, Scripts, ScrollRestoration, useRouteError } from '@remix-run/react';
 import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node';
 
 import stylesheet from './tailwind.css?url';

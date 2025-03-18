@@ -95,7 +95,7 @@ export default function EditorialPlugin() {
 								? 'No views so far.'
 								: `${loaderData.totalViews} views`}
 						</strong>
-						<SignedIn>&nbsp;(Your own views are not counted!)</SignedIn>
+						<SignedIn contextOwner={loaderData.story.authors.map(author => author.userId)}>&nbsp;(Your own views are not counted!)</SignedIn>
 					</span>
 				</span>
 				<SignedIn>

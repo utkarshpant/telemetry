@@ -29,6 +29,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export type StoryCardProps = { story: Story };
 
+/**
+ *
+ * @param Story An object containing the story data.
+ * @returns A "card" component that displays the story data. This is reused on /home and /:username.
+ */
 function StoryCard({ story }: StoryCardProps) {
 	const publishDelta = Date.now() - Date.parse(story.publishedAt as string);
 	const daysSincePublished = Math.floor(publishDelta / (1000 * 60 * 60 * 24));
@@ -58,7 +63,9 @@ function StoryCard({ story }: StoryCardProps) {
 					/>
 				) : null}
 			</span>
-			<p className='text-base text-stone-400 font-light'>{story.subtitle}</p>
+			<p className='text-base text-stone-700 dark:text-stone-400 font-light'>
+				{story.subtitle}
+			</p>
 			<span className='text-xs text-stone-600 dark:text-stone-400 border-b border-b-stone-400 dark:border-b-stone-600 pb-2 flex flex-row gap-1 flex-wrap items-center'>
 				{story.isPublished
 					? `Published on ${getLocaleDateString(story.publishedAt as string)}.`
@@ -85,18 +92,24 @@ export default function Index() {
 	const stories = useLoaderData<Story[]>();
 	return (
 		<div className='flex flex-col gap-4'>
-			{stories.length > 0
-				? stories.map((story) => (
-						<StoryCard
-							key={story.id}
-							story={story}
-						/>
-				  ))
-				: (
-					<div className='w-full flex flex-row items-center text-sm dark:text-stone-500 text-stone-400 justify-center h-[56vh] select-none'>
-						Looks a little empty here...  &nbsp;<Link to={'/story/new'} className='hover:underline'>Start a new story!</Link>
-					</div>
-				)}
+			{stories.length > 0 ? (
+				stories.map((story) => (
+					<StoryCard
+						key={story.id}
+						story={story}
+					/>
+				))
+			) : (
+				<div className='w-full flex flex-row items-center text-sm dark:text-stone-500 text-stone-400 justify-center h-[56vh] select-none'>
+					Looks a little empty here... &nbsp;
+					<Link
+						to={'/story/new'}
+						className='hover:underline'
+					>
+						Start a new story!
+					</Link>
+				</div>
+			)}
 		</div>
 	);
 }
