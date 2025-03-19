@@ -45,7 +45,9 @@ export default class YjsServer implements Party.Server {
 						`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`
 					);
 					const state = await fetch(
-						`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`
+						`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`, {
+							method: 'GET',
+						}
 					)
 						.then(async (res) => {
 							if (res.ok) {

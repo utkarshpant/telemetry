@@ -90,7 +90,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 		if (
 			(!session?.has('userId') ||
-				story.authors.some((author) => author.userId !== session.get('userId'))) &&
+				!story.authors.some((author) => author.userId === session.get('userId'))) &&
 			!story.isPublished
 		) {
 			throw new Response("Sorry, we couldn't find that story.", { status: 404 });
