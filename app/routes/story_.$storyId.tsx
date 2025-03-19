@@ -3,11 +3,12 @@
 import { validateRequestAndReturnSession } from '~/auth/utils.server';
 import { prisma } from 'prisma/db.server';
 import { json, MetaFunction, type LoaderFunctionArgs } from '@remix-run/node';
-import { isRouteErrorResponse, useLoaderData, useRouteError } from '@remix-run/react';
+import { isRouteErrorResponse, Link, useLoaderData, useRouteError } from '@remix-run/react';
 import { type Story } from '@prisma/client';
 import LexicalEditor from './../components/Editor/LexicalEditor';
 import { usePartySocket } from 'partysocket/react';
 import Header from '~/components/Header/Header';
+import { RandomStoryBackgroundErrorBoundary } from '~/components/RandomStoryBackground';
 
 export type StoryLoaderData = {
 	story: Story & {
@@ -147,12 +148,15 @@ export function ErrorBoundary() {
 	const error = useRouteError();
 	if (isRouteErrorResponse(error)) {
 		return (
-			<div className='p-12'>
+			<RandomStoryBackgroundErrorBoundary>
+			<div className='p-12 bg-neutral-950 bg-opacity-80 h-screen w-screen z-0'>
 				<h1 className='text-6xl'>
 					{error.status} {error.statusText}
 				</h1>
 				<p className='my-4'>{error.data}</p>
+				<p>Head over to <Link to='/' className='underline'>the home page</Link> to check out what Telemetry members are writing, or even <Link to='/sign-up' className='underline'>sign-up</Link> yourself!</p>
 			</div>
+			</RandomStoryBackgroundErrorBoundary>
 		);
 	} else if (error instanceof Error) {
 		return (

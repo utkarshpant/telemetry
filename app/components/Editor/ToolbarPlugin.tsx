@@ -4,6 +4,7 @@ import { $findMatchingParent, mergeRegister } from '@lexical/utils';
 import {
 	$createParagraphNode,
 	$createTextNode,
+	$getRoot,
 	$getSelection,
 	$isRangeSelection,
 	$isRootOrShadowRoot,
@@ -13,10 +14,7 @@ import {
 	SELECTION_CHANGE_COMMAND,
 	TextNode,
 } from 'lexical';
-import {
-	$createQuoteNode,
-	$isQuoteNode,
-} from '@lexical/rich-text';
+import { $createQuoteNode, $isQuoteNode } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { $createSubtitleNode, $isSubtitleNode } from './nodes/SubtitleNode';
@@ -35,6 +33,7 @@ export default function ToolbarPlugin() {
 	const [isSuperscript, setIsSuperscript] = useState(false);
 	const [isCode, setIsCode] = useState(false);
 	const [isSubtitle, setIsSubtitle] = useState(false);
+	const [hasTitle, setHasTitle] = useState(false);
 
 	const $updateToolbar = useCallback(() => {
 		const selection = $getSelection();
@@ -51,6 +50,10 @@ export default function ToolbarPlugin() {
 				const parent = e.getParent();
 				return parent !== null && $isRootOrShadowRoot(parent);
 			});
+
+			$getRoot().getFirstChild()?.getType() === 'title'
+				? setHasTitle(true)
+				: setHasTitle(false);
 
 			if (element !== null) {
 				setIsHeading($isTitleNode(element));
@@ -119,14 +122,14 @@ export default function ToolbarPlugin() {
 						suffixNode.insertAfter(spaceNode);
 						spaceNode.selectNext();
 					}
-
-				}
-				else if (lastChar === '`') {
+				} else if (lastChar === '`') {
 					// get the first occurrence of a backtick, and format the text between the backticks as code
 					const backTickIndex = textContent.indexOf('`');
 					if (backTickIndex !== -1 && backTickIndex !== textContent.length - 1) {
 						const before = textContent.slice(0, backTickIndex);
-						const after = textContent.slice(backTickIndex + 1, textContent.length).replace('`', '');
+						const after = textContent
+							.slice(backTickIndex + 1, textContent.length)
+							.replace('`', '');
 						const codeNode = $createTextNode(after);
 						codeNode.setFormat('code');
 						textNode.setTextContent(before);
@@ -136,15 +139,25 @@ export default function ToolbarPlugin() {
 						normalTextNode.selectNext();
 					}
 				}
-			}),
+			})
 		);
 	}, [editor, $updateToolbar]);
 
 	return (
 		<div
-			className={`transition duration-700 ${editable ? 'bg-emerald-600 dark:bg-stone-800' : 'bg-neutral-800'} md:fixed static top-0 left-0 right-0 gap-0 md:gap-2 flex-col px-12 py-2 animate-fade-in font-sans text-white align-baseline shadow-lg print:hidden flex text-xs md:text-sm`}
+			className={`transition duration-700 ${
+				editable ? 'bg-emerald-600 dark:bg-neutral-800' : 'bg-neutral-800 dark:bg-stone-700'
+			} sticky top-0 left-0 right-0 gap-0 md:gap-2 flex-col px-2 md:px-12 py-2 animate-fade-in font-sans text-white align-baseline shadow-lg print:hidden flex text-sm w-full`}
 			ref={toolbarRef}
 		>
+			<span className='text-base md:text-sm'>Formatting</span>
+			<hr
+				className={
+					(editable
+						? `border-neutral-300 dark:border-neutral-600`
+						: 'border-neutral-300') + ' transition-colors mt-2 md:mt-0'
+				}
+			/>
 			<div>
 				<button
 					onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
@@ -194,6 +207,7 @@ export default function ToolbarPlugin() {
 					className={`font-sans font-semibold rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
 						isHeading ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
 					}`}
+					disabled={hasTitle}
 				>
 					Title
 				</button>
@@ -251,9 +265,7 @@ export default function ToolbarPlugin() {
 						isCode ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
 					}`}
 				>
-					<span className='font-code'>
-						&lt;/&gt;
-					</span>
+					<span className='font-code'>&lt;/&gt;</span>
 				</button>
 			</div>
 		</div>

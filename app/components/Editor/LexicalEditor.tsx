@@ -107,7 +107,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 			const doc = getDocFromMap(id, yjsDocMap);
 			yPartyKitProviderRef.current = new YPartyKitProvider(
 				process.env.NODE_ENV === 'development'
-					? 'http://' + window.location.hostname + ":1999"
+					? 'http://' + window.location.hostname + ':1999'
 					: 'https://telemetry-party.utkarshpant.partykit.dev',
 				String(storyData.story.id),
 				doc,
@@ -120,7 +120,8 @@ export default function Editor({ children }: { children?: ReactNode }) {
 		[storyData.story.id]
 	);
 
-	const userIsOwner = storyData.story.authors.findIndex((author) => author.userId === user?.id) === 0;
+	const userIsOwner =
+		storyData.story.authors.findIndex((author) => author.userId === user?.id) === 0;
 
 	return (
 		<ClientOnly
@@ -146,9 +147,9 @@ export default function Editor({ children }: { children?: ReactNode }) {
 				>
 					{children}
 
-					<div className='flex flex-col items-center md:items-start w-full min-h-screen'>
-						<div className='relative w-full no-scrollbar overflow-scroll border-b border-b-stone-400 dark:border-b-stone-700 p-6 md:p-12 md:print:pr-12 flex flex-col gap-1'>
-							{storyData.allowEdits ? <ToolbarPlugin /> : null}
+					<div className='relative flex flex-col items-center md:items-start w-full min-h-screen'>
+						{storyData.allowEdits ? <ToolbarPlugin /> : null}
+						<div className='w-full no-scrollbar overflow-scroll border-b border-b-stone-400 dark:border-b-stone-700 p-6 md:p-12 md:print:pr-12 flex flex-col gap-1'>
 							<RichTextPlugin
 								contentEditable={
 									<ContentEditable
@@ -209,7 +210,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 							/>
 							<HistoryPlugin />
 						</div>
-						<div className='p-12 no-scrollbar w-full flex flex-col gap-4 overflow-y-scroll flex-shrink-0 min-h-full print:hidden h-full flex-1'>
+						<div className='p-6 md:p-12 no-scrollbar w-full flex flex-col gap-4 overflow-y-scroll flex-shrink-0 min-h-full print:hidden h-full flex-1'>
 							<EditorialPlugin />
 						</div>
 					</div>
@@ -222,11 +223,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 							initialEditorState={$prePopulatedRichText}
 							username={user?.firstName}
 							shouldBootstrap={false}
-							cursorColor={
-								userIsOwner
-									? 'red'
-									: 'grey'
-							}
+							cursorColor={userIsOwner ? 'red' : 'grey'}
 						/>
 					) : null}
 				</LexicalComposer>
