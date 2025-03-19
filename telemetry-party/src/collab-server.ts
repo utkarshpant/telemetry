@@ -2,7 +2,10 @@ import type * as Party from 'partykit/server';
 import { onConnect } from 'y-partykit';
 import type { Binding, Provider } from '@lexical/yjs';
 import {
+	$createParagraphNode,
+	$createTextNode,
 	$getRoot,
+	$insertNodes,
 	type Klass,
 	type LexicalEditor,
 	type LexicalNode,
@@ -10,15 +13,16 @@ import {
 	type SerializedEditorState,
 	type SerializedLexicalNode,
 } from 'lexical';
-import { $generateHtmlFromNodes } from '@lexical/html';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { createHeadlessEditor } from '@lexical/headless';
 import { createBinding, syncLexicalUpdateToYjs, syncYjsChangesToLexical } from '@lexical/yjs';
 import { type YEvent, applyUpdate, Doc, Transaction } from 'yjs';
 import * as Y from 'yjs';
-import { TitleNode } from '../../app/components/Editor/nodes/TitleNode';
+import { $createTitleNode, TitleNode } from '../../app/components/Editor/nodes/TitleNode';
 import { SubtitleNode } from '../../app/components/Editor/nodes/SubtitleNode';
 import { QuoteNode } from '@lexical/rich-text';
 import { parseHTML } from 'linkedom';
+import story from './story';
 
 // Set up JSDOM before using any HTML generation functionality
 const dom = parseHTML('<!DOCTYPE html><html><body></body></html>');
@@ -36,33 +40,48 @@ export default class YjsServer implements Party.Server {
 				load: async () => {
 					// check if a yjs doc is already initialized. If not, get JSON state from api and initialize a lexical editor with it.
 					// then create a yjs doc from the lexical editor state and set it in the party room
+					console.log(
+						'Loading from ',
+						`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`
+					);
 					const state = await fetch(
 						`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`
 					)
 						.then(async (res) => {
-							const response = await res.json();
-							console.log('Fetched story state:', response);
-							return response;
+							if (res.ok) {
+								const response = await res.json();
+								console.log('Fetched story state:', response);
+								return response;
+							}
 						})
 						.catch((e) => {
 							console.error('Error fetching story state:', e);
+							return null;
 						});
 
 					const result = withHeadlessCollaborationEditor(
 						[TitleNode, SubtitleNode, QuoteNode],
 						(editor, binding) => {
 							// try {
+							if (state) {
 								editor.setEditorState(editor.parseEditorState(state));
-							// } catch (e) {
-							// 	console.error(
-							// 		'An error occured while setting editor state specifically!',
-							// 		e
-							// 	);
-							// }
-
-							// const yDocState = Y.encodeStateAsUpdate(binding.doc);
-							// Y.applyUpdate(ydoc, yDocState);
-							// return ydoc;
+							} else {
+								editor.update(() => {
+									const root = $getRoot();
+									// init empty editor, such as when creating a new story
+									const titleNode = $createTitleNode().append(
+										$createTextNode('Untitled. This was set by the server.').setMode('token')
+									);
+									root.append(titleNode);
+									const placeholderContent = $createParagraphNode().append(
+										$createTextNode('Start typing here...').setMode('token')
+									);
+									root.append(placeholderContent);
+									// console.log(root.getChildren());
+								}, {
+									discrete: true,
+								});
+							}
 							return binding.doc;
 						}
 					);
