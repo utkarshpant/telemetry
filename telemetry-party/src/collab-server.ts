@@ -36,20 +36,22 @@ export default class YjsServer implements Party.Server {
 	onConnect(conn: Party.Connection) {
 		try {
 			const roomId = this.party.id;
+			console.log(
+				'Should load data from:',
+				`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`
+			);
 			return onConnect(conn, this.party, {
 				load: async () => {
 					// check if a yjs doc is already initialized. If not, get JSON state from api and initialize a lexical editor with it.
 					// then create a yjs doc from the lexical editor state and set it in the party room
-					console.log(
-						'Loading from ',
-						`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`
-					);
 					const state = await fetch(
-						`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`, {
+						`${this.party.env.TELEMETRY_HOST}/api/story/${this.party.id}`,
+						{
 							method: 'GET',
 						}
 					)
 						.then(async (res) => {
+							console.log(res.status);
 							if (res.ok) {
 								const response = await res.json();
 								console.log('Fetched story state:', response);
@@ -60,29 +62,34 @@ export default class YjsServer implements Party.Server {
 							console.error('Error fetching story state:', e);
 							return null;
 						});
-
+					console.log('state', state);
 					const result = withHeadlessCollaborationEditor(
 						[TitleNode, SubtitleNode, QuoteNode],
 						(editor, binding) => {
 							// try {
-							if (state) {
+							if (state && state.root.children.length > 0) {
 								editor.setEditorState(editor.parseEditorState(state));
 							} else {
-								editor.update(() => {
-									const root = $getRoot();
-									// init empty editor, such as when creating a new story
-									const titleNode = $createTitleNode().append(
-										$createTextNode('Untitled. This was set by the server.').setMode('token')
-									);
-									root.append(titleNode);
-									const placeholderContent = $createParagraphNode().append(
-										$createTextNode('Start typing here...').setMode('token')
-									);
-									root.append(placeholderContent);
-									// console.log(root.getChildren());
-								}, {
-									discrete: true,
-								});
+								editor.update(
+									() => {
+										const root = $getRoot();
+										// init empty editor, such as when creating a new story
+										const titleNode = $createTitleNode().append(
+											$createTextNode(
+												"This story doesn't have a title yet. Add one!"
+											).setMode('token')
+										);
+										root.append(titleNode);
+										const placeholderContent = $createParagraphNode().append(
+											$createTextNode('Start typing here...').setMode('token')
+										);
+										root.append(placeholderContent);
+										// console.log(root.getChildren());
+									},
+									{
+										discrete: true,
+									}
+								);
 							}
 							return binding.doc;
 						}

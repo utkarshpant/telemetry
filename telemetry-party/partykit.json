@@ -14,6 +14,9 @@
   },
   "vars": {
     "NODE_ENV": "production",
-    "TELEMETRY_HOST": "https://telemetry.blog"
+    "DATABASE_URL": "postgresql://tlmt:tlmt_8719_@localhost:5432/tlmtdb?schema=public",
+    "TELEMETRY_SECRET": "15111997&14061998&8710",
+    "CLOUDINARY_URL": "cloudinary://833569572295721:GUxw1v3Ytnexw4EzyVOvVJ9JoQo@dodckrmff",
+    "REDIS_URL": "redis://redis:6379"
   }
 }
