@@ -17,7 +17,7 @@ export default function SignedIn({
 	contextOwner,
 }: {
 	children?: ReactNode;
-	contextOwner?: number | string;
+	contextOwner?: number | number[] | string | string[];
 }) {
 	const { signedIn, user } = useUser();
 	if (!contextOwner) {

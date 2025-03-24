@@ -33,7 +33,9 @@ export default function EditorialPlugin() {
 		});
 	});
 
-	const isUserAuthor = signedIn ? loaderData.story.authors.some((author) => author.userId === user?.id) : false;
+	const isUserAuthor = signedIn
+		? loaderData.story.authors.some((author) => author.userId === user?.id)
+		: false;
 
 	return (
 		<div
@@ -95,7 +97,11 @@ export default function EditorialPlugin() {
 								? 'No views so far.'
 								: `${loaderData.totalViews} views`}
 						</strong>
-						<SignedIn contextOwner={loaderData.story.authors.map(author => author.userId)}>&nbsp;(Your own views are not counted!)</SignedIn>
+						<SignedIn
+							contextOwner={loaderData.story.authors.map((author) => author.userId)}
+						>
+							&nbsp;(Your own views are not counted!)
+						</SignedIn>
 					</span>
 				</span>
 				<SignedIn>
@@ -204,9 +210,7 @@ export default function EditorialPlugin() {
 									alt='Delete'
 									className='h-4'
 								></img>
-								{deleteFetcher.state !== 'idle'
-									? 'Deleting...'
-									: 'Delete'}
+								{deleteFetcher.state !== 'idle' ? 'Deleting...' : 'Delete'}
 							</button>
 						</div>
 					) : null}
