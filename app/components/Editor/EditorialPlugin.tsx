@@ -24,7 +24,7 @@ export default function EditorialPlugin() {
 	const [editable, setEditable] = useState(false);
 	const updateFetcher = useUpdateFetcher();
 	const deleteFetcher = useDeleteFetcher();
-	const readingTime = loaderData.story.wordCount / 200;
+	const readingTime = Math.floor(loaderData.story.wordCount / 200);
 	const { user, signedIn } = useUser();
 
 	useEffect(() => {

@@ -41,7 +41,7 @@ const theme: EditorThemeClasses = {
 		base: 'text-left',
 		code: 'code',
 	},
-	paragraph: 'font-serif font-normal',
+	paragraph: 'font-serif font-normal leading-loose',
 	root: 'text-left',
 	ltr: 'text-left',
 	heading: {
