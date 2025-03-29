@@ -157,7 +157,7 @@ export default function Editor({ children }: { children?: ReactNode }) {
 
 					<div className='relative flex flex-col items-center md:items-start md:w-2/3 w-full md:max-w-prose md:m-auto min-h-screen'>
 						{storyData.allowEdits ? <ToolbarPlugin /> : null}
-						<div className='w-full no-scrollbar overflow-scroll border-b border-b-stone-400 dark:border-b-stone-700 p-6 md:p-12 md:py-6 md:print:pr-12 flex flex-col gap-1'>
+						<div className='w-full no-scrollbar overflow-scroll border-b border-b-stone-400 dark:border-b-stone-700 p-6 pl-8 md:py-6 md:print:pr-12 flex flex-col gap-1'>
 							<ListPlugin />
 							<RichTextPlugin
 								contentEditable={
