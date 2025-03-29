@@ -15,6 +15,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 			},
 			data: {
 				status: 'INACTIVE',
+				expiresAt: new Date(),
 			},
 		})
 		.catch((error) => {
