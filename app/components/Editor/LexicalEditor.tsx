@@ -29,6 +29,10 @@ import { CollaborationPlugin } from '@lexical/react/LexicalCollaborationPlugin';
 import * as Y from 'yjs';
 import YPartyKitProvider from 'y-partykit/provider';
 import useUser from '~/hooks/useUser';
+import {
+	ListPlugin
+} from '@lexical/react/LexicalListPlugin.js';
+import { ListItemNode, ListNode } from '@lexical/list';
 
 const theme: EditorThemeClasses = {
 	// Define your theme here
@@ -51,6 +55,10 @@ const theme: EditorThemeClasses = {
 	quote: 'quote',
 	placeholder: 'placeholder',
 	code: 'code',
+	list: {
+		ol: 'list-decimal list-outside leading-loose',
+		listitem: 'font-serif',
+	}
 };
 
 function onError(error: Error) {
@@ -142,14 +150,15 @@ export default function Editor({ children }: { children?: ReactNode }) {
 						editorState: storyData.allowEdits ? null : $prePopulatedRichText,
 						onError,
 						editable: false,
-						nodes: [QuoteNode, TitleNode, SubtitleNode],
+						nodes: [QuoteNode, TitleNode, SubtitleNode, ListNode, ListItemNode],
 					}}
 				>
 					{children}
 
-					<div className='relative flex flex-col items-center md:items-start w-full min-h-screen'>
+					<div className='relative flex flex-col items-center md:items-start md:w-2/3 w-full md:max-w-prose md:m-auto min-h-screen'>
 						{storyData.allowEdits ? <ToolbarPlugin /> : null}
-						<div className='w-full no-scrollbar overflow-scroll border-b border-b-stone-400 dark:border-b-stone-700 p-6 md:p-12 md:print:pr-12 flex flex-col gap-1'>
+						<div className='w-full no-scrollbar overflow-scroll border-b border-b-stone-400 dark:border-b-stone-700 p-6 md:p-12 md:py-6 md:print:pr-12 flex flex-col gap-1'>
+							<ListPlugin />
 							<RichTextPlugin
 								contentEditable={
 									<ContentEditable

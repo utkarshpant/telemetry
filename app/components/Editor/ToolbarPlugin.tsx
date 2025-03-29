@@ -14,6 +14,7 @@ import {
 	SELECTION_CHANGE_COMMAND,
 	TextNode,
 } from 'lexical';
+import { $isListItemNode, $isListNode, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND } from '@lexical/list';
 import { $createQuoteNode, $isQuoteNode } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
 import { useCallback, useRef, useState, useEffect } from 'react';
@@ -34,10 +35,12 @@ export default function ToolbarPlugin() {
 	const [isCode, setIsCode] = useState(false);
 	const [isSubtitle, setIsSubtitle] = useState(false);
 	const [hasTitle, setHasTitle] = useState(false);
+	const [isList, setIsList] = useState(false);
 
 	const $updateToolbar = useCallback(() => {
 		const selection = $getSelection();
 		if ($isRangeSelection(selection)) {
+			// check if the selection has any of the basic formatting options applied;
 			setIsBold(selection.hasFormat('bold'));
 			setIsItalic(selection.hasFormat('italic'));
 			setIsUnderline(selection.hasFormat('underline'));
@@ -45,20 +48,21 @@ export default function ToolbarPlugin() {
 			setIsSuperscript(selection.hasFormat('superscript'));
 			setIsCode(selection.hasFormat('code'));
 
-			const anchorNode = selection.anchor.getNode();
-			const element = $findMatchingParent(anchorNode, (e) => {
-				const parent = e.getParent();
-				return parent !== null && $isRootOrShadowRoot(parent);
-			});
-
+			// check if the first child of the root is a title node
+			// if yes, we can disable the title button later
 			$getRoot().getFirstChild()?.getType() === 'title'
 				? setHasTitle(true)
 				: setHasTitle(false);
 
+			const anchorNode = selection.anchor.getNode();
+			const element = anchorNode.getParent();
+
+			// set the state corresponding to the selection parent's node type to true
 			if (element !== null) {
 				setIsHeading($isTitleNode(element));
 				setIsQuote($isQuoteNode(element));
 				setIsSubtitle($isSubtitleNode(element));
+				setIsList($isListNode(element) || $isListItemNode(element));
 			}
 		}
 	}, []);
@@ -147,7 +151,7 @@ export default function ToolbarPlugin() {
 		<div
 			className={`transition duration-700 ${
 				editable ? 'bg-emerald-600 dark:bg-neutral-800' : 'bg-neutral-800 dark:bg-stone-700'
-			} sticky top-0 left-0 right-0 gap-0 md:gap-2 flex-col px-2 md:px-12 py-2 animate-fade-in font-sans text-white align-baseline shadow-lg print:hidden flex text-sm w-full`}
+			} sticky md:top-5 top-0 left-0 right-0 gap-0 md:gap-2 flex-col px-2 md:px-6 py-2 animate-fade-in font-sans text-white align-baseline shadow-lg print:hidden flex text-sm w-full`}
 			ref={toolbarRef}
 		>
 			<span className='text-base md:text-sm'>Formatting</span>
@@ -266,6 +270,25 @@ export default function ToolbarPlugin() {
 					}`}
 				>
 					<span className='font-code'>&lt;/&gt;</span>
+				</button>
+				<button
+					type='button'
+					className={`rounded w-auto px-4 md:px-2 h-10 md:h-8 hover:bg-white hover:bg-opacity-15 align-middle transition-all ${
+						isList ? 'bg-white bg-opacity-35 hover:bg-opacity-45' : ''
+					}`}
+					onClick={() => {
+						if (!isList) {
+							editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+						} else {
+							editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+						}
+					}}
+				>
+					<span className='text-xs'>
+						<ol>
+							<li>1.</li>
+						</ol>
+					</span>
 				</button>
 			</div>
 		</div>
