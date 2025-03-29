@@ -52,7 +52,7 @@ const theme: EditorThemeClasses = {
 		h1: 'editor-heading-1',
 		h2: 'editor-heading-2',
 	},
-	quote: 'quote',
+	quote: 'quote leading-loose',
 	placeholder: 'placeholder',
 	code: 'code',
 	list: {
