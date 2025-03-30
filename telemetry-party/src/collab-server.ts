@@ -21,6 +21,7 @@ import * as Y from 'yjs';
 import { $createTitleNode, TitleNode } from '../../app/components/Editor/nodes/TitleNode';
 import { SubtitleNode } from '../../app/components/Editor/nodes/SubtitleNode';
 import { QuoteNode } from '@lexical/rich-text';
+import { ListNode, ListItemNode } from '@lexical/list';
 import { parseHTML } from 'linkedom';
 import story from './story';
 
@@ -64,7 +65,7 @@ export default class YjsServer implements Party.Server {
 						});
 					console.log('state', state);
 					const result = withHeadlessCollaborationEditor(
-						[TitleNode, SubtitleNode, QuoteNode],
+						[TitleNode, SubtitleNode, QuoteNode, ListNode, ListItemNode],
 						(editor, binding) => {
 							// try {
 							if (state && state.root.children.length > 0) {
